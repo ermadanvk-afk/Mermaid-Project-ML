@@ -1,0 +1,11 @@
+image_path,predicted_emotion,ground_truth,is_correct
+data/Emotion6/images/sadness/134.jpg,Error,Sadness,0
+data/Emotion6/images/sadness/286.jpg,Sadness,Sadness,1
+data/Emotion6/images/sadness/36.jpg,Anger,Sadness,0
+data/Emotion6/images/sadness/305.jpg,Sadness,Sadness,1
+data/Emotion6/images/sadness/41.jpg,Sadness,Sadness,1
+data/Emotion6/images/sadness/63.jpg,Anger,Sadness,0
+data/Emotion6/images/sadness/251.jpg,Joy,Sadness,0
+data/Emotion6/images/sadness/175.jpg,Sadness,Sadness,1
+data/Emotion6/images/sadness/149.jpg,Fear,Sadness,0
+data/Emotion6/images/sadness/207.jpg,Sadness,Sadness,1
