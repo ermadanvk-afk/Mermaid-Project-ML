@@ -1,3 +1,7 @@
 down.py    
 myenv   
-./ml-mermaid/Mermaid-Project-ML/data
+
+# Mermaid-Project-ML Ignores
+Mermaid-Project-ML/data/
+Mermaid-Project-ML/generated_refs/
+Mermaid-Project-ML/__pycache__/
