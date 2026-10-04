@@ -207,15 +207,15 @@ if __name__ == "__main__":
     app = build_graph(mem_manager)
 
     # 3. Load Dataset
-    print(f"\n=== Loading Emotion6 Dataset ===")
-    dataset = load_emotion6("data/Emotion6/images")
+    print(f"\n=== Loading Emotion6 Dataset (Uniform 1000 Subset) ===")
+    dataset = load_emotion6("data/Emotion6/images", total_limit=1000)
+    
     if not dataset:
         print("Dataset not found or empty. Exiting.")
         exit(1)
         
-    # Limit to 10 images for testing
-    limit = 10
-    subset = dataset[:limit]
+    # The dataloader now handles returning exactly 1000 uniformly distributed images
+    subset = dataset
     
     # Emotion6 classes
     candidate_emotions = ["Anger", "Disgust", "Fear", "Joy", "Sadness", "Surprise"]
