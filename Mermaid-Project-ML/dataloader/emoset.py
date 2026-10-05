@@ -17,12 +17,14 @@ def load_emoset(dataset_root: str) -> list[dict]:
         print(f"Warning: EmoSet directory '{dataset_root}' not found.")
         return data
         
-    for emotion_dir in os.listdir(dataset_root):
-        dir_path = os.path.join(dataset_root, emotion_dir)
-        if os.path.isdir(dir_path):
-            for img_path in glob.glob(os.path.join(dir_path, "*.jpg")):
-                data.append({
-                    "image_path": img_path,
-                    "ground_truth": emotion_dir.capitalize()
-                })
+    # EmoSet is stored as flat files: dataset_root/emotion_xxxxx.jpg
+    for img_path in glob.glob(os.path.join(dataset_root, "*.jpg")):
+        filename = os.path.basename(img_path)
+        # Parse emotion from filename (e.g., amusement_00290.jpg -> amusement)
+        emotion = filename.split('_')[0].capitalize()
+        data.append({
+            "image_path": img_path,
+            "ground_truth": emotion
+        })
+        
     return data

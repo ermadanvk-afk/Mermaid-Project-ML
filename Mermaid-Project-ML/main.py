@@ -196,7 +196,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
 if __name__ == "__main__":
     import time
     from core.state import create_initial_state
-    from dataloader import load_emotion6
+    from dataloader.emoset import load_emoset
 
     print("=== Initializing Compute-Efficient MERMAID ===")
     
@@ -207,18 +207,17 @@ if __name__ == "__main__":
     app = build_graph(mem_manager)
 
     # 3. Load Dataset
-    print(f"\n=== Loading Emotion6 Dataset (Uniform 1000 Subset) ===")
-    dataset = load_emotion6("data/Emotion6/images", total_limit=1000)
+    print(f"\n=== Loading EmoSet Dataset ===")
+    dataset = load_emoset("data/emoset_1000")
     
     if not dataset:
         print("Dataset not found or empty. Exiting.")
         exit(1)
         
-    # The dataloader now handles returning exactly 1000 uniformly distributed images
     subset = dataset
     
-    # Emotion6 classes
-    candidate_emotions = ["Anger", "Disgust", "Fear", "Joy", "Sadness", "Surprise"]
+    # EmoSet classes
+    candidate_emotions = ["Amusement", "Anger", "Awe", "Contentment", "Disgust", "Excitement", "Fear", "Sadness"]
     
     correct_predictions = 0
     total = len(subset)
@@ -228,7 +227,7 @@ if __name__ == "__main__":
     
     # Ensure a results directory exists
     os.makedirs("results", exist_ok=True)
-    csv_filename = "results/emotion6_evaluation.csv"
+    csv_filename = "results/emoset_evaluation.csv"
     
     print(f"\n=== Starting Evaluation on {total} images (Logging to {csv_filename}) ===")
     start_time = time.time()
