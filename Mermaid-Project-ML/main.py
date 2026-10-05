@@ -281,3 +281,8 @@ if __name__ == "__main__":
     print(f"Accuracy: {accuracy:.2f}%")
     print(f"Total Time: {end_time - start_time:.2f} seconds")
 
+    # Force flush and exit to prevent huggingface/pytorch background threads from hanging
+    import sys
+    sys.stdout.flush()
+    os._exit(0)
+
