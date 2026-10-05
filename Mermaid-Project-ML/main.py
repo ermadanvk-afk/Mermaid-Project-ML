@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     # Ensure a results directory exists
     os.makedirs("results", exist_ok=True)
-    csv_filename = "results/emoset_evaluation.csv"
+    csv_filename = "results/emoset_evaluation_qwen2.5.csv"
     
     print(f"\n=== Starting Evaluation on {total} images (Logging to {csv_filename}) ===")
     start_time = time.time()

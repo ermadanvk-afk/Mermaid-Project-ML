@@ -4,22 +4,46 @@ from PIL import Image
 from core.state import MERMAIDState
 from core.memory_manager import MemoryOrchestrator
 from core.schemas import ReflectionOutput
-
+from qwen_vl_utils import process_vision_info
 def generate_caption(image_path: str, memory_manager: MemoryOrchestrator) -> str:
     """Helper to generate a caption for an image."""
     model = memory_manager.mllm
     processor = memory_manager.processor
     
-    image = Image.open(image_path).convert("RGB")
-    prompt = "[INST] <image>\nDescribe this image in terms of emotional content. Include expressions, body language, scene context, dominant colours, and any object that influences mood. [/INST]"
+    prompt_text = "Describe this image in terms of emotional content. Include expressions, body language, scene context, dominant colours, and any object that influences mood."
     
-    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image_path},
+                {"type": "text", "text": prompt_text},
+            ],
+        }
+    ]
+    
+    text = processor.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    image_inputs, video_inputs = process_vision_info(messages)
+    
+    inputs = processor(
+        text=[text],
+        images=image_inputs,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    ).to(model.device)
     
     with torch.no_grad():
-        output_ids = model.generate(**inputs, max_new_tokens=150)
+        generated_ids = model.generate(**inputs, max_new_tokens=150)
         
-    input_len = inputs["input_ids"].shape[1]
-    return processor.decode(output_ids[0][input_len:], skip_special_tokens=True).strip()
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    return processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0].strip()
 
 def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
     """
@@ -71,17 +95,40 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
         "Do not include any other text."
     )
     
-    prompt = f"[INST] {instruction}\n<image> [/INST]"
-    original_image = Image.open(state['image_path']).convert("RGB")
+    image_path = state['image_path']
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image_path},
+                {"type": "text", "text": instruction},
+            ],
+        }
+    ]
     
-    # 4. Call MLLM with a single image
-    inputs = processor(text=prompt, images=original_image, return_tensors="pt").to(model.device)
+    text = processor.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    image_inputs, video_inputs = process_vision_info(messages)
     
+    inputs = processor(
+        text=[text],
+        images=image_inputs,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    ).to(model.device)
+    
+    # 4. Generate JSON response
     with torch.no_grad():
-        output_ids = model.generate(**inputs, max_new_tokens=150)
+        generated_ids = model.generate(**inputs, max_new_tokens=150)
         
-    input_len = inputs["input_ids"].shape[1]
-    raw_output = processor.decode(output_ids[0][input_len:], skip_special_tokens=True).strip()
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    raw_output = processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0].strip()
     
     # 5. Parse JSON
     try:

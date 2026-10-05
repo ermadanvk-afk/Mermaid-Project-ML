@@ -7,14 +7,6 @@ from core.memory_manager import MemoryOrchestrator
 def _build_prompt(state: MERMAIDState) -> str:
     """
     Builds the correct text prompt for the Decision Agent based on query_mode.
-
-    Three modes (Appendix C, MERMAID paper):
-      - "qinit" : Base Emotion Classification Prompt — no feedback, first pass.
-      - "qtext" : Augmentation prompt guided by textual_feedback.
-      - "qvis"  : Augmentation prompt guided by visual_feedback.
-
-    Returns:
-        The full [INST] ... [/INST] prompt string for LLaVA-NeXT.
     """
     labels       = ", ".join(state["candidate_emotions"])
     caption      = state.get("caption", "")
@@ -22,7 +14,6 @@ def _build_prompt(state: MERMAIDState) -> str:
     prediction   = state.get("current_prediction", "")
 
     if query_mode == "qinit":
-        # ── Base Emotion Classification Prompt (paper, Appendix C) ──────────
         text = (
             f"This image must be classified into one of these human emotions: {labels}.\n"
             "Based on psychological and visual features such as facial expression, body posture, "
@@ -31,10 +22,7 @@ def _build_prompt(state: MERMAIDState) -> str:
             f'Image Description: "{caption}"\n'
             "Think carefully and choose only one emotion word from the list above."
         )
-
     else:
-        # ── Emotion Classifier Prompt Augmentation (paper, Appendix C) ──────
-        # Selects the correct feedback source depending on mode.
         if query_mode == "qtext":
             feedback = state.get("textual_feedback") or {}
         else:  # "qvis"
@@ -54,47 +42,59 @@ def _build_prompt(state: MERMAIDState) -> str:
             f"{labels}. Output only the chosen emotion word."
         )
 
-    return f"[INST] <image>\n{text} [/INST]"
+    return text
 
+
+from qwen_vl_utils import process_vision_info
 
 def run_decision_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
-    """
-    Core classifier node. Called three times per outer loop with different query modes:
-      - Qinit (Block 1) : initial classification.
-      - Qtext (Block 2) : re-classification guided by textual reflection feedback.
-      - Qvis  (Block 3) : re-classification guided by visual reflection feedback.
-
-    Input:
-        state          – Current LangGraph state (query_mode determines prompt).
-        memory_manager – Provides the 4-bit LLaVA-NeXT model and processor.
-
-    Output:
-        dict with key 'current_prediction' — one label from candidate_emotions.
-    """
     mode = state.get("query_mode", "qinit")
-    print(f"--- [Agent: Decision | mode={mode}] Iteration {state['iteration']} ---")
+    print(f"--- [Agent: Decision | mode={mode}] Iteration {state.get('iteration', 0)} ---")
 
     # 1. Ensure MLLM is on GPU
     memory_manager.load_mllm()
     model     = memory_manager.mllm
     processor = memory_manager.processor
 
-    # 2. Load image
-    image = Image.open(state["image_path"]).convert("RGB")
+    # 2. Load image path
+    image_path = state["image_path"]
 
     # 3. Build the mode-appropriate prompt
-    prompt = _build_prompt(state)
+    prompt_text = _build_prompt(state)
 
-    # 4. Run inference
-    inputs = processor(text=prompt, images=image, return_tensors="pt").to(model.device)
+    # 4. Prepare Qwen inputs
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "image", "image": image_path},
+                {"type": "text", "text": prompt_text},
+            ],
+        }
+    ]
+    
+    text = processor.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    image_inputs, video_inputs = process_vision_info(messages)
+    
+    inputs = processor(
+        text=[text],
+        images=image_inputs,
+        videos=video_inputs,
+        padding=True,
+        return_tensors="pt",
+    ).to(model.device)
 
     with torch.no_grad():
-        output_ids = model.generate(**inputs, max_new_tokens=20)
+        generated_ids = model.generate(**inputs, max_new_tokens=20)
 
-    input_len  = inputs["input_ids"].shape[1]
-    raw_output = processor.decode(
-        output_ids[0][input_len:], skip_special_tokens=True
-    ).strip()
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    raw_output = processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0].strip()
 
     # 5. Map raw output to a valid candidate (case-insensitive, fallback to first)
     prediction = next(

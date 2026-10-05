@@ -58,3 +58,30 @@ def run_text_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrator)
 2. I will create the directory structure and the core state/memory scripts.
 3. I will create the agent blueprints.
 4. We will review the blueprint before plugging in the heavy 2B/7B models.
+
+
+
+Some Fallback : 
+Why the accuracy is 20%:
+The fatal flaw right now is that the Textual Reflection Agent is too lenient. Because LLMs tend to be agreeable, when the Text Agent looks at the initial guess (e.g., "Contentment" for a happy scene), the majority of the perspectives just agree and vote good_enough.
+
+Because it votes good_enough on the very first try, the algorithm hits Line 4 and immediately exits, spitting out the wrong prediction. The Augmentation Agent (Image Generation) and Visual Reflection Agent are never being called at all!
+
+How we can fix this and get the accuracy up:
+We need to force the system to actually use the Visual Reflection loop. We have two ways to do this:
+
+Option 1: Make the Textual Vote Stricter (Stay true to the paper) Currently, in agents/text_reflection.py, the votes are aggregated by Majority Rule (if 2 out of 3 agents say good_enough, it exits). We can change this to a Unanimous Rule: if even one single perspective votes needs_revision, the system is forced to proceed to Visual Reflection.
+
+Option 2: Remove the Early Exit entirely (Slight deviation from paper) We can modify the LangGraph router in main.py to simply delete the early exit. This guarantees that every single image will undergo at least 1 full round of Emotion-Guided Image Generation and Visual Reflection.
+
+Which option would you like me to implement? (Option 1 is the most scientifically sound, but Option 2 guarantees the visual agents actually get used!).
+
+So why is it failing if the prompts match the paper?
+The authors of the paper likely discovered the same issue (that LLMs tend to be "yes-men" and agree with the first guess too easily). To combat this, they mentioned in Section 5.1 that they used an ensemble size of 5 (b=5) and up to 4 distinct perspectives.
+
+Right now, our code only samples 3 perspectives and uses a simple "majority rules" vote (if 2 out of 3 say good_enough, it exits).
+
+Let's Fix It (Option 1)
+Since the prompts are already completely faithful to the paper, the best way to solve this is to make the voting system stricter so it doesn't prematurely exit.
+
+Shall I go ahead and modify _aggregate_votes in text_reflection.py to require a Unanimous Vote? (Meaning if even one perspective disagrees, the system will trigger the Image Generation and Visual Reflection loops just like it's supposed to).

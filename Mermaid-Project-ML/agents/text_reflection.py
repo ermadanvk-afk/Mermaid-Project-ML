@@ -128,18 +128,35 @@ def _run_single_perspective(
         labels=labels,
     )
 
-    prompt = f"[INST] {instruction} [/INST]"
-
-    # Text-only inference (no image token)
-    inputs = processor(text=prompt, return_tensors="pt").to(model.device)
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": instruction}
+            ]
+        }
+    ]
+    
+    text = processor.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    
+    # Text-only inference
+    inputs = processor(
+        text=[text],
+        padding=True,
+        return_tensors="pt"
+    ).to(model.device)
 
     with torch.no_grad():
-        output_ids = model.generate(**inputs, max_new_tokens=150)
+        generated_ids = model.generate(**inputs, max_new_tokens=150)
 
-    input_len  = inputs["input_ids"].shape[1]
-    raw_output = processor.decode(
-        output_ids[0][input_len:], skip_special_tokens=True
-    ).strip()
+    generated_ids_trimmed = [
+        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+    ]
+    raw_output = processor.batch_decode(
+        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+    )[0].strip()
 
     parsed = _parse_json_output(raw_output, prediction, state["candidate_emotions"])
     print(f"      [{perspective_name}] status={parsed['status']}, suggestion={parsed['suggestion']}")

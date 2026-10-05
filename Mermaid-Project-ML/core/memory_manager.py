@@ -1,6 +1,6 @@
 import torch
 import gc
-from transformers import AutoProcessor, LlavaNextForConditionalGeneration, BitsAndBytesConfig
+from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration, BitsAndBytesConfig
 from diffusers import StableDiffusionInstructPix2PixPipeline, LCMScheduler
 
 class MemoryOrchestrator:
@@ -8,7 +8,7 @@ class MemoryOrchestrator:
     Manages loading and unloading of models between CPU RAM and GPU VRAM 
     to prevent Out-Of-Memory errors on constrained hardware (12GB VRAM).
     """
-    def __init__(self, mllm_model_id="llava-hf/llava-v1.6-mistral-7b-hf", diff_model_id="timbrooks/instruct-pix2pix"):
+    def __init__(self, mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct", diff_model_id="timbrooks/instruct-pix2pix"):
         self.mllm_loaded: bool = False
         self.diffusion_loaded: bool = False
         
@@ -31,7 +31,7 @@ class MemoryOrchestrator:
             )
             self.processor = AutoProcessor.from_pretrained(self.mllm_model_id)
             # bitsandbytes 4-bit loads directly to GPU via device_map="auto"
-            self.mllm = LlavaNextForConditionalGeneration.from_pretrained(
+            self.mllm = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 self.mllm_model_id,
                 quantization_config=quantization_config,
                 device_map="auto",
