@@ -12,7 +12,7 @@ The system follows a cyclic, multi-agent architecture orchestrated by a state gr
 3.  **Caption Generator (MLLM):** Generates a rich textual description of the input image before the main loop begins.
 4.  **Decision Agent (MLLM):** Acts as the primary classifier, taking the image and textual/visual feedback to propose an emotion label.
 5.  A text-only critic that evaluates the logical consistency between the generated caption and the Decision Agent's prediction.
-6.  **Augmentation Agent (Diffusion Model):** Generates a set of reference images depicting all candidate emotions applied to the original scene, accelerated via Latent Consistency Models (LCM).
+6.  **Augmentation Agent (Diffusion Model):** Generates a set of reference images depicting all candidate emotions applied to the original scene, accelerated with ByteDance Hyper-SD's 4-step LoRA on a Stable Diffusion 1.5 Img2Img pipeline.
 7.  **Visual Self-Reflection Agent (MLLM):** Compares the original image against the generated reference images to provide visual feedback on the prediction.
 
 ## 3. Workflow Data Flow
@@ -38,12 +38,12 @@ graph TD
 *   **Target Hardware:** Intel i7, 16GB/32GB RAM, NVIDIA RTX 3050 (12GB VRAM).
 *   **Model Quantization:** MLLMs (e.g., Qwen2-VL-2B or 7B) will be quantized to 4-bit/8-bit using `bitsandbytes` to fit within the 12GB VRAM limit.
 *   **Sequential Execution:** The MLLM and the Diffusion model will *never* reside in VRAM simultaneously. The Model Manager handles dynamic loading/unloading.
-*   **LCM Acceleration:** The Augmentation Agent utilizes LCM-LoRA to reduce diffusion steps from 100 to 2-4, dramatically reducing inference time and compute load.
+*   **Hyper-SD Acceleration:** The Augmentation Agent fuses ByteDance's Hyper-SD 4-step LoRA into the Stable Diffusion 1.5 Img2Img pipeline and uses the DDIM scheduler to reduce inference to 4 steps while retaining image structure.
 *   **Structured Outputs:** `instructor` or `outlines` libraries are used to enforce strict JSON outputs from the MLLMs, ensuring robust state transitions without parsing errors.
 
 ## 5. Technology Stack
 *   **Orchestration:** `langgraph`, `langchain-core`
-*   **Machine Learning:** `torch`, `transformers`, `diffusers`, `peft` (for LCM-LoRA)
+*   **Machine Learning:** `torch`, `transformers`, `diffusers`, `peft` (for LoRA support)
 *   **Optimization:** `accelerate` (memory management), `bitsandbytes` (quantization)
 *   **Structured Generation:** `instructor` / `outlines`
  **Textual Self-Reflection Agent (MLLM):**

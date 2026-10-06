@@ -22,7 +22,7 @@ mermaid-project/
     ├── caption_agent.py     # Image captioning logic
     ├── decision_agent.py    # Initial emotion prediction
     ├── text_reflection.py   # Text-only evaluation
-    ├── augmentation.py      # LCM Diffusion image generation
+    ├── augmentation.py      # Hyper-SD accelerated diffusion image generation
     └── visual_reflection.py # Visual comparison
 ```
 

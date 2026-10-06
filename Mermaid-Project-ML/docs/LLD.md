@@ -60,7 +60,7 @@ class MERMAIDState(TypedDict):
     ```
 
 ### 3.4 Node: `AugmentationNode`
-*   **Action:** Iterates through `candidate_emotions` and generates an image for each using the diffusion model + LCM.
+*   **Action:** Iterates through `candidate_emotions` and generates an image for each using Stable Diffusion 1.5 Img2Img with ByteDance Hyper-SD's fused 4-step LoRA and the DDIM scheduler.
 *   **Input State:** `image_path`, `candidate_emotions`
 *   **Output State:** Updates `reference_images`
 *   **Model Constraints:** Requires Model Manager to swap out MLLM and load Diffusion model to VRAM.

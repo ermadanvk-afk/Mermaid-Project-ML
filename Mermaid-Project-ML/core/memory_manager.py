@@ -1,14 +1,18 @@
 import torch
 import gc
-from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration, BitsAndBytesConfig
-from diffusers import StableDiffusionInstructPix2PixPipeline, LCMScheduler
+from transformers import AutoProcessor, Qwen2VLForConditionalGeneration, BitsAndBytesConfig
+from diffusers import DDIMScheduler, StableDiffusionImg2ImgPipeline
 
 class MemoryOrchestrator:
     """
     Manages loading and unloading of models between CPU RAM and GPU VRAM 
     to prevent Out-Of-Memory errors on constrained hardware (12GB VRAM).
     """
-    def __init__(self, mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct", diff_model_id="timbrooks/instruct-pix2pix"):
+    def __init__(
+        self,
+        mllm_model_id="Qwen/Qwen2-VL-7B-Instruct",
+        diff_model_id="stable-diffusion-v1-5/stable-diffusion-v1-5",
+    ):
         self.mllm_loaded: bool = False
         self.diffusion_loaded: bool = False
         
@@ -31,7 +35,7 @@ class MemoryOrchestrator:
             )
             self.processor = AutoProcessor.from_pretrained(self.mllm_model_id)
             # bitsandbytes 4-bit loads directly to GPU via device_map="auto"
-            self.mllm = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            self.mllm = Qwen2VLForConditionalGeneration.from_pretrained(
                 self.mllm_model_id,
                 quantization_config=quantization_config,
                 device_map="auto",
@@ -40,14 +44,18 @@ class MemoryOrchestrator:
             
     def _init_diffusion(self):
         if self.diffusion_pipeline is None:
-            print(f"[MemoryManager] Initializing Diffusion ({self.diff_model_id}) with LCM...")
-            self.diffusion_pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
-                self.diff_model_id, dtype=torch.float16
+            print(f"[MemoryManager] Initializing Diffusion ({self.diff_model_id}) with Hyper-SD...")
+            self.diffusion_pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
+                self.diff_model_id, torch_dtype=torch.float16, safety_checker=None
             )
-            # Replace scheduler with LCM for 2-4 step generation
-            self.diffusion_pipeline.scheduler = LCMScheduler.from_config(self.diffusion_pipeline.scheduler.config)
-            # Load LCM LoRA
-            self.diffusion_pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
+            self.diffusion_pipeline.load_lora_weights(
+                "ByteDance/Hyper-SD",
+                weight_name="Hyper-SD15-4steps-lora.safetensors",
+            )
+            self.diffusion_pipeline.fuse_lora()
+            self.diffusion_pipeline.scheduler = DDIMScheduler.from_config(
+                self.diffusion_pipeline.scheduler.config
+            )
             # Pipeline is instantiated on CPU by default
         
     def load_mllm(self) -> None:
