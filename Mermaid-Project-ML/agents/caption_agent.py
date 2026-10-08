@@ -27,7 +27,7 @@ def run_caption_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": image_path},
+                {"type": "image", "image": image_path, "max_pixels": 65536},
                 {"type": "text", "text": prompt_text},
             ],
         }

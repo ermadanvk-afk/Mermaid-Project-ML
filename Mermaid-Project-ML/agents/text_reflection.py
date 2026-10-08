@@ -173,6 +173,8 @@ def _aggregate_votes(votes: list[dict], current_prediction: str) -> dict:
     statuses    = [v["status"] for v in votes]
     status_vote = Counter(statuses).most_common(1)[0][0]
 
+    statuses = [v["status"] for v in votes]
+    
     # Among those voting needs_revision, find most common suggestion
     revisers = [v["suggestion"] for v in votes if v["status"] == "needs_revision"]
     if revisers:

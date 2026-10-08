@@ -16,7 +16,7 @@ def generate_caption(image_path: str, memory_manager: MemoryOrchestrator) -> str
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": image_path},
+                {"type": "image", "image": image_path, "max_pixels": 65536},
                 {"type": "text", "text": prompt_text},
             ],
         }
@@ -100,7 +100,7 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
         {
             "role": "user",
             "content": [
-                {"type": "image", "image": image_path},
+                {"type": "image", "image": image_path, "max_pixels": 65536},
                 {"type": "text", "text": instruction},
             ],
         }
