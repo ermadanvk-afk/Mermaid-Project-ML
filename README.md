@@ -103,12 +103,21 @@ We benchmarked our implementation across multiple hardware configurations, datas
 
 *(Note: The paper utilizes proprietary 13B models and H100 clusters, while our results represent optimized 7B performance on consumer 12GB GPUs).*
 
-| Dataset | Architecture (MLLM + Diffusion) | Total Samples | Accuracy | Correct | Incorrect |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Emotion6** | LLaVA-NeXT 7B + LCM LoRA | 1,000 | **46.30%** | 463 | 537 |
-| **EmoSet** | LLaVA-NeXT 7B + LCM LoRA | 1,000 | **52.40%** | 524 | 476 |
-| **ArtPhoto** | LLaVA-NeXT 7B + LCM LoRA | 806 | **35.61%** | 287 | 519 |
-| **Emotion6** | **Qwen2.5-VL 7B** + LCM LoRA | 1,000 | **51.90%** | 519 | 481 |
-| **EmoSet** | **Qwen2.5-VL 7B** + LCM LoRA | 1,000 | **59.10%** | 591 | 409 |
+| Dataset | Architecture (MLLM + Diffusion) | Total Samples | Accuracy (Ours) | Accuracy (Paper Denoising 100 Steps) | Comparison | Correct | Incorrect |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Emotion6** | LLaVA-NeXT 7B + LCM LoRA | 1,000 | **46.30%** | **61.90%** | <span style="color:red">▼ 15.60%</span> | 463 | 537 |
+| **EmoSet** | LLaVA-NeXT 7B + LCM LoRA | 1,000 | **52.40%** | **50.40%** | <span style="color:green">▲ 2.00%</span> | 524 | 476 |
+| **ArtPhoto** | LLaVA-NeXT 7B + LCM LoRA | 806 | **35.61%** | **34.72%** | <span style="color:green">▲ 0.89%</span> | 287 | 519 |
+| **Emotion6** | **Qwen2.5-VL 7B** + LCM LoRA | 1,000 | **51.90%** | **56.80%**\* | <span style="color:red">▼ 4.90%</span> | 519 | 481 |
+| **EmoSet** | **Qwen2.5-VL 7B** + LCM LoRA | 1,000 | **59.10%** | **63.70%**\* | <span style="color:red">▼ 4.60%</span> | 591 | 409 |
 
 *The migration to Qwen2.5-VL + Interleaved Multi-Image Prompting yielded a significant accuracy jump over LLaVA-NeXT across all benchmarks.*
+*\* Note: Paper results for Qwen use Qwen2-VL 7B, while our implementation uses the newer Qwen2.5-VL 7B.*
+
+---
+
+## 👥 Contributors
+
+* **Umesh Vishwakarma** – Directed data aggregation and organization. Developed the robust data loader scripts and engineered the core system infrastructure.
+* **Pulak Kumar Sarkar** – Architected the visual augmentation agents, integrating the generative pipeline and implementing the emotion-guided visualization processes.
+* **Madan Vishwakarma** – High Level and Low Level representation of the strategy in the paper, translating theoretical concepts from the paper into a functional implementation. Led the continuous evaluation and benchmarking across multiple datasets.
