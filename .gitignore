@@ -5,3 +5,4 @@ myenv
 Mermaid-Project-ML/data/
 Mermaid-Project-ML/generated_refs/
 Mermaid-Project-ML/__pycache__/
+__pycache__/

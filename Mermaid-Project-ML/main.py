@@ -196,19 +196,19 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
 if __name__ == "__main__":
     import time
     from core.state import create_initial_state
-    from dataloader.emotion6 import load_emotion6
+    from dataloader.artphoto import load_artphoto
 
     print("=== Initializing Compute-Efficient MERMAID ===")
     
     # 1. Initialize Memory Orchestrator
-    mem_manager = MemoryOrchestrator()
+    mem_manager = MemoryOrchestrator(mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct")
 
     # 2. Build Graph
     app = build_graph(mem_manager)
 
     # 3. Load Dataset
-    print(f"\n=== Loading Emotion6 Dataset ===")
-    dataset = load_emotion6("data/Emotion6/images", total_limit=1000)
+    print(f"\n=== Loading Artphoto Dataset ===")
+    dataset = load_artphoto("data/testImages_artphoto")
     
     if not dataset:
         print("Dataset not found or empty. Exiting.")
@@ -216,8 +216,8 @@ if __name__ == "__main__":
         
     subset = dataset
     
-    # Emotion6 classes
-    candidate_emotions = ["Anger", "Disgust", "Fear", "Joy", "Sadness", "Surprise"]
+    # Artphoto classes
+    candidate_emotions = ["Amusement", "Anger", "Awe", "Contentment", "Disgust", "Excitement", "Fear", "Sadness"]
     
     correct_predictions = 0
     total = len(subset)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     
     # Ensure a results directory exists
     os.makedirs("results", exist_ok=True)
-    csv_filename = "results/emotion6_evaluation_qwen2.5.csv"
+    csv_filename = "results/artphoto_evaluation_qwen2.5.csv"
     
     print(f"\n=== Starting Evaluation on {total} images (Logging to {csv_filename}) ===")
     start_time = time.time()
