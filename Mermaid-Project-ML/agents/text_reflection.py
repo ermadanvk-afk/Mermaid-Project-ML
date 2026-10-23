@@ -69,7 +69,9 @@ _BASE_PROMPT_TEMPLATE = (
 
 def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: list) -> dict:
     """
-    Robust JSON parser with regex fallback to prevent spurious needs_revision loops.
+    Robust JSON parser with regex fallback.
+    Crucial: If the reflection suggests the same emotion as current_prediction,
+    or confirms it, status is normalized to 'good_enough' so it exits immediately.
     """
     cleaned = raw.strip()
     if "```json" in cleaned:
@@ -78,12 +80,13 @@ def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: li
         cleaned = cleaned.split("```")[1].split("```")[0].strip()
         
     cleaned = cleaned.replace('\\_', '_')
-        
+    
+    result = None
     # Attempt 1: Pydantic validation
     try:
         parsed = ReflectionOutput.model_validate_json(cleaned)
         matched = next((e for e in candidate_emotions if e.lower() == parsed.suggestion.lower()), None)
-        return {
+        result = {
             "status": parsed.status,
             "suggestion": matched if matched else current_prediction,
             "justification": parsed.justification
@@ -92,31 +95,41 @@ def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: li
         pass
 
     # Attempt 2: Regex extraction
-    try:
-        status_m = re.search(r'"status"\s*:\s*"(good_enough|needs_revision)"', cleaned, re.IGNORECASE)
-        sugg_m = re.search(r'"suggestion"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
-        just_m = re.search(r'"justification"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
-        if status_m:
-            status = status_m.group(1).lower()
-            raw_sugg = sugg_m.group(1) if sugg_m else current_prediction
-            matched = next((e for e in candidate_emotions if e.lower() == raw_sugg.lower()), None)
-            return {
-                "status": status,
-                "suggestion": matched if matched else current_prediction,
-                "justification": just_m.group(1) if just_m else "Parsed via regex fallback."
-            }
-    except Exception:
-        pass
+    if not result:
+        try:
+            status_m = re.search(r'"status"\s*:\s*"(good_enough|needs_revision)"', cleaned, re.IGNORECASE)
+            sugg_m = re.search(r'"suggestion"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
+            just_m = re.search(r'"justification"\s*:\s*"([^"]+)"', cleaned, re.IGNORECASE)
+            if status_m:
+                status = status_m.group(1).lower()
+                raw_sugg = sugg_m.group(1) if sugg_m else current_prediction
+                matched = next((e for e in candidate_emotions if e.lower() == raw_sugg.lower()), None)
+                result = {
+                    "status": status,
+                    "suggestion": matched if matched else current_prediction,
+                    "justification": just_m.group(1) if just_m else "Parsed via regex fallback."
+                }
+        except Exception:
+            pass
 
     # Attempt 3: Keyword fallback
-    lower = cleaned.lower()
-    status = "good_enough" if "good_enough" in lower else "needs_revision"
-    matched_e = next((e for e in candidate_emotions if e.lower() in lower), None)
-    return {
-        "status": status,
-        "suggestion": matched_e if matched_e else current_prediction,
-        "justification": "Fallback parse from model output."
-    }
+    if not result:
+        lower = cleaned.lower()
+        status = "good_enough" if "good_enough" in lower else "needs_revision"
+        matched_e = next((e for e in candidate_emotions if e.lower() in lower), None)
+        result = {
+            "status": status,
+            "suggestion": matched_e if matched_e else current_prediction,
+            "justification": "Fallback parse from model output."
+        }
+
+    # CRITICAL LOGIC FIX:
+    # If the reflection suggestion matches the current prediction,
+    # the agent agrees! Mark as 'good_enough' to avoid needless diffusion loops.
+    if result["suggestion"].lower() == current_prediction.lower():
+        result["status"] = "good_enough"
+
+    return result
 
 def _run_single_perspective(
     perspective_name: str,

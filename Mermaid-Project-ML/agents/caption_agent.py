@@ -30,7 +30,11 @@ def run_llava_generation(prompt: str, image_path: str = None, memory_manager: Me
     inputs = {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
     
     with torch.no_grad():
-        generated_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
+        generated_ids = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            max_length=None  # Explicitly None to prevent warnings and enforce max_new_tokens
+        )
         
     output_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
     if "ASSISTANT:" in output_text:

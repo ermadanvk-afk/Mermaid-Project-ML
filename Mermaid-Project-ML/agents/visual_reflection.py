@@ -83,6 +83,10 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
                 "suggestion": state['current_prediction'],
                 "justification": "Visual parse fallback."
             }
+            
+    # CRITICAL: If the visual reflection confirms the prediction, mark good_enough
+    if feedback["suggestion"].lower() == state["current_prediction"].lower():
+        feedback["status"] = "good_enough"
         
     print(f"    -> Feedback Status: {feedback['status']} | Suggestion: {feedback['suggestion']}")
     return {"visual_feedback": feedback}
