@@ -1,3 +1,7 @@
+import sys
+# Prevent diffusers from importing incompatible pre-installed torchao on Kaggle/Colab
+sys.modules["torchao"] = None
+
 import torch
 import gc
 from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration, BitsAndBytesConfig
