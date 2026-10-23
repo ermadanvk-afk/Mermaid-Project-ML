@@ -1,64 +1,50 @@
+import os
 import torch
 from PIL import Image
 from core.state import MERMAIDState
 from core.memory_manager import MemoryOrchestrator
-from qwen_vl_utils import process_vision_info
 
-def run_caption_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
-    """
-    Calls the MLLM to generate a rich textual description of the input image.
-    """
-    print(f"--- [Agent: Captioning] Analyzing {state['image_path']} ---")
-    
-    # 1. Ensure MLLM is on GPU
+def run_llava_generation(prompt: str, image_path: str = None, memory_manager: MemoryOrchestrator = None, max_new_tokens: int = 200) -> str:
+    """Helper to run LLaVA-NeXT-13B inference with correct Vicuna prompt formatting."""
     memory_manager.load_mllm()
-    
-    # 2. Extract model and processor from memory manager
     model = memory_manager.mllm
     processor = memory_manager.processor
     
-    # 3. Load Image (Optional: process_vision_info can load it from string path, but PIL also works)
-    image_path = state['image_path']
-    
-    # 4. Construct prompt for Qwen2.5-VL
-    prompt_text = "Describe this image in terms of emotional content. Include expressions, body language, scene context, dominant colours, and any object that influences mood."
-    
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image", "image": image_path, "max_pixels": 65536},
-                {"type": "text", "text": prompt_text},
-            ],
-        }
-    ]
-    
-    # 5. Prepare inputs using Qwen processor
-    text = processor.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-    image_inputs, video_inputs = process_vision_info(messages)
-    
-    inputs = processor(
-        text=[text],
-        images=image_inputs,
-        videos=video_inputs,
-        padding=True,
-        return_tensors="pt",
-    ).to(model.device)
-    
-    # 6. Generate Output
-    with torch.no_grad():
-        generated_ids = model.generate(**inputs, max_new_tokens=150)
+    if image_path:
+        raw_image = Image.open(image_path).convert("RGB")
+        formatted_prompt = (
+            "A chat between a curious human and an artificial intelligence assistant. "
+            "The assistant gives helpful, detailed, and polite answers to the human's questions. "
+            f"USER: <image>\n{prompt} ASSISTANT:"
+        )
+        inputs = processor(text=formatted_prompt, images=raw_image, return_tensors="pt")
+    else:
+        formatted_prompt = (
+            "A chat between a curious human and an artificial intelligence assistant. "
+            "The assistant gives helpful, detailed, and polite answers to the human's questions. "
+            f"USER: {prompt} ASSISTANT:"
+        )
+        inputs = processor(text=formatted_prompt, return_tensors="pt")
         
-    # Trim the input prompt tokens from the generated output
-    generated_ids_trimmed = [
-        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-    ]
-    caption = processor.batch_decode(
-        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-    )[0].strip()
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    inputs = {k: v.to(device) if isinstance(v, torch.Tensor) else v for k, v in inputs.items()}
+    
+    with torch.no_grad():
+        generated_ids = model.generate(**inputs, max_new_tokens=max_new_tokens)
+        
+    output_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    if "ASSISTANT:" in output_text:
+        output_text = output_text.split("ASSISTANT:")[-1]
+    return output_text.strip()
+
+def run_caption_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
+    """
+    Calls LLaVA-NeXT to generate a rich emotional description of the input image.
+    """
+    print(f"--- [Agent: Captioning] Analyzing {os.path.basename(state['image_path'])} ---")
+    
+    prompt = "Describe this image in terms of emotional content. Include expressions, body language, scene context, dominant colours, and any object that influences mood."
+    caption = run_llava_generation(prompt, state['image_path'], memory_manager, max_new_tokens=200)
     
     print(f"    -> Generated Caption: '{caption}'")
-    
     return {"caption": caption}

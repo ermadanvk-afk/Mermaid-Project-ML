@@ -6,41 +6,38 @@ from core.memory_manager import MemoryOrchestrator
 
 def run_augmentation_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
     """
-    Generates reference images for ALL candidate emotions using a diffusion model.
-    
-    Input:
-        - state: The current LangGraph state containing 'image_path' and 'candidate_emotions'.
-        - memory_manager: Handles GPU/CPU model swapping and provides access to the diffusion pipeline.
-        
-    Output:
-        - dict: A dictionary containing 'reference_images' mapping each emotion to its generated image path.
-        
-    What it does:
-        1. Ensures the Diffusion Model is on GPU (offloads MLLM).
-        2. Loops through each candidate emotion.
-        3. Uses InstructPix2Pix with LCM to quickly generate an image where the subject exhibits the emotion (using 4 steps).
-        4. Saves the generated images to disk and returns their paths.
+    Generates reference images for candidate emotions using InstructPix2Pix with LCM.
+    Caches reference images per input image so repeated reflection loops do not re-run diffusion.
     """
-    print("--- [Agent: Augmentation] Generating Emotion References ---")
+    img_stem = os.path.splitext(os.path.basename(state['image_path']))[0]
+    cache_dir = os.path.join("generated_refs", img_stem)
+    os.makedirs(cache_dir, exist_ok=True)
     
-    # 1. Ensure Diffusion Model is on GPU (This will offload the MLLM!)
+    existing_refs = state.get("reference_images", {})
+    emotions_needed = [
+        e for e in state["candidate_emotions"]
+        if e not in existing_refs or not os.path.exists(existing_refs[e])
+    ]
+    
+    if not emotions_needed:
+        print(f"--- [Agent: Augmentation] Reusing all cached references for {img_stem} ---")
+        return {"reference_images": existing_refs}
+        
+    print(f"--- [Agent: Augmentation] Generating References ({len(emotions_needed)} needed) ---")
     memory_manager.load_diffusion()
     pipeline = memory_manager.diffusion_pipeline
+    original_image = Image.open(state['image_path']).convert("RGB").resize((512, 512))
     
-    # 2. Load the original image
-    original_image = Image.open(state['image_path']).convert("RGB")
+    generated_refs = dict(existing_refs)
     
-    generated_refs = {}
-    
-    # Ensure a directory exists for generated images
-    os.makedirs("generated_refs", exist_ok=True)
-    
-    # 3. Generate images using LCM accelerated InstructPix2Pix
-    for emotion in state['candidate_emotions']:
-        # Format a prompt for InstructPix2Pix
+    for emotion in emotions_needed:
+        save_path = os.path.join(cache_dir, f"ref_{emotion.lower().replace(' ', '_')}.jpg")
+        if os.path.exists(save_path):
+            generated_refs[emotion] = save_path
+            print(f"    - Reusing cached ref for '{emotion}' at {save_path}")
+            continue
+
         prompt = f"make them look {emotion}, express {emotion}"
-        
-        # LCM requires fewer steps and a low guidance scale
         with torch.no_grad():
             result_image = pipeline(
                 prompt=prompt,
@@ -51,9 +48,9 @@ def run_augmentation_agent(state: MERMAIDState, memory_manager: MemoryOrchestrat
                 output_type="pil"
             ).images[0]
             
-        save_path = f"generated_refs/ref_{emotion.lower().replace(' ', '_')}.jpg"
         result_image.save(save_path)
         generated_refs[emotion] = save_path
         print(f"    -> Generated ref for '{emotion}' at {save_path}")
         
+    memory_manager._offload_diffusion()
     return {"reference_images": generated_refs}

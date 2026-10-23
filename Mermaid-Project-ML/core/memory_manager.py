@@ -1,14 +1,16 @@
 import torch
 import gc
-from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration, BitsAndBytesConfig
+from transformers import LlavaNextProcessor, LlavaNextForConditionalGeneration, BitsAndBytesConfig
 from diffusers import StableDiffusionInstructPix2PixPipeline, LCMScheduler
 
 class MemoryOrchestrator:
     """
     Manages loading and unloading of models between CPU RAM and GPU VRAM 
-    to prevent Out-Of-Memory errors on constrained hardware (12GB VRAM).
+    to prevent Out-Of-Memory errors on constrained hardware.
+    
+    Supports LLaVA-NeXT-13B (4-bit NF4 quantized) and InstructPix2Pix (LCM).
     """
-    def __init__(self, mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct", diff_model_id="timbrooks/instruct-pix2pix"):
+    def __init__(self, mllm_model_id="llava-hf/llava-v1.6-vicuna-13b-hf", diff_model_id="timbrooks/instruct-pix2pix"):
         self.mllm_loaded: bool = False
         self.diffusion_loaded: bool = False
         
@@ -19,78 +21,79 @@ class MemoryOrchestrator:
         self.processor = None
         self.diffusion_pipeline = None
         
-        print("[MemoryManager] Initialized. Models will be loaded on demand.")
+        print(f"[MemoryManager] Initialized with MLLM: {self.mllm_model_id}")
         
     def _init_mllm(self):
         if self.mllm is None:
-            print(f"[MemoryManager] Initializing MLLM ({self.mllm_model_id}) in 4-bit...")
-            quantization_config = BitsAndBytesConfig(
+            print(f"[MemoryManager] Initializing MLLM ({self.mllm_model_id}) in 4-bit NF4...")
+            bnb_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.float16
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_use_double_quant=True
             )
-            self.processor = AutoProcessor.from_pretrained(self.mllm_model_id)
-            # bitsandbytes 4-bit loads directly to GPU via device_map="auto"
-            self.mllm = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            self.processor = LlavaNextProcessor.from_pretrained(self.mllm_model_id)
+            self.mllm = LlavaNextForConditionalGeneration.from_pretrained(
                 self.mllm_model_id,
-                quantization_config=quantization_config,
-                device_map="auto",
-                torch_dtype=torch.float16
+                quantization_config=bnb_config,
+                device_map={"": 0} if torch.cuda.is_available() else "auto",
+                torch_dtype=torch.float16,
+                low_cpu_mem_usage=True
             )
             
     def _init_diffusion(self):
         if self.diffusion_pipeline is None:
             print(f"[MemoryManager] Initializing Diffusion ({self.diff_model_id}) with LCM...")
-            self.diffusion_pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
-                self.diff_model_id, dtype=torch.float16
-            )
-            # Replace scheduler with LCM for 2-4 step generation
-            self.diffusion_pipeline.scheduler = LCMScheduler.from_config(self.diffusion_pipeline.scheduler.config)
-            # Load LCM LoRA
-            self.diffusion_pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
-            # Pipeline is instantiated on CPU by default
-        
-    def load_mllm(self) -> None:
-        """Loads the MLLM to GPU, offloading Diffusion if necessary."""
-        if self.diffusion_loaded:
-            self._offload_diffusion()
+            num_gpus = torch.cuda.device_count()
             
+            if num_gpus > 1:
+                # Kaggle T4 x2 Dual-GPU mode: dedicated GPU 1
+                print("[MemoryManager] Dual-GPU detected: Loading Diffusion on cuda:1")
+                self.diffusion_pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
+                    self.diff_model_id,
+                    torch_dtype=torch.float16,
+                    safety_checker=None
+                ).to("cuda:1")
+            else:
+                # Single-GPU mode: enable CPU offloading to avoid VRAM clash with 13B model
+                print("[MemoryManager] Single-GPU detected: Initializing Diffusion with CPU offload")
+                self.diffusion_pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
+                    self.diff_model_id,
+                    torch_dtype=torch.float16,
+                    safety_checker=None
+                )
+                if torch.cuda.is_available():
+                    self.diffusion_pipeline.enable_model_cpu_offload(device="cuda:0")
+
+            # Replace scheduler with LCM for fast 4-step generation
+            try:
+                self.diffusion_pipeline.scheduler = LCMScheduler.from_config(self.diffusion_pipeline.scheduler.config)
+                self.diffusion_pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
+            except Exception as e:
+                print(f"[MemoryManager] LCM LoRA not applied (continuing with standard steps): {e}")
+
+    def load_mllm(self) -> None:
+        """Loads MLLM context, clearing CUDA cache."""
         if self.mllm is None:
             self._init_mllm()
-            self.mllm_loaded = True
-        elif not self.mllm_loaded:
-            print("[MemoryManager] Note: 4-bit MLLM usually remains on GPU. Skipping explicit move.")
-            self.mllm_loaded = True
-            
+        torch.cuda.empty_cache()
+        gc.collect()
+        self.mllm_loaded = True
+
     def load_diffusion(self) -> None:
-        """Loads the Diffusion model to GPU, offloading MLLM if necessary."""
-        if self.mllm_loaded:
-            self._offload_mllm()
-            
+        """Prepares diffusion pipeline."""
         if self.diffusion_pipeline is None:
             self._init_diffusion()
-            
-        if not self.diffusion_loaded:
-            print("[MemoryManager] Moving Diffusion model to GPU...")
-            self.diffusion_pipeline.to('cuda')
-            self.diffusion_loaded = True
-            
+        torch.cuda.empty_cache()
+        gc.collect()
+        self.diffusion_loaded = True
+
     def _offload_mllm(self) -> None:
-        """Moves MLLM to CPU and clears CUDA cache."""
-        print("[MemoryManager] Offloading MLLM...")
-        # 4-bit models cannot easily be moved to CPU via .to('cpu').
-        # Given 12GB VRAM, a 4-bit 7B (5GB) and FP16 Diffusion (3GB) can coexist (8GB < 12GB).
-        # We simply clear the cache to ensure we have maximum free space before running Diffusion.
         torch.cuda.empty_cache()
         gc.collect()
         self.mllm_loaded = False
-        
+
     def _offload_diffusion(self) -> None:
-        """Clears CUDA cache to make room. Doesn't strictly move to CPU to avoid fp16 errors."""
-        if self.diffusion_pipeline is not None:
-            print("[MemoryManager] Clearing cache after Diffusion...")
-            # FP16 models complain when moved to CPU. Since 12GB can hold both,
-            # we just clear the CUDA cache and leave it in VRAM.
-            torch.cuda.empty_cache()
-            gc.collect()
+        torch.cuda.empty_cache()
+        gc.collect()
         self.diffusion_loaded = False
