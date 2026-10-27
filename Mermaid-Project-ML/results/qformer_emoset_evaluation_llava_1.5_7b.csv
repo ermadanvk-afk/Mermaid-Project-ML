@@ -1,0 +1,11 @@
+image_path,predicted_emotion,ground_truth,is_correct
+data/emoset_1000/amusement_01682.jpg,Contentment,Amusement,0
+data/emoset_1000/amusement_02017.jpg,Amusement,Amusement,1
+data/emoset_1000/amusement_02071.jpg,Amusement,Amusement,1
+data/emoset_1000/amusement_02128.jpg,Amusement,Amusement,1
+data/emoset_1000/amusement_02210.jpg,Excitement,Amusement,0
+data/emoset_1000/amusement_02632.jpg,Amusement,Amusement,1
+data/emoset_1000/amusement_02787.jpg,Amusement,Amusement,1
+data/emoset_1000/amusement_02822.jpg,Contentment,Amusement,0
+data/emoset_1000/amusement_02886.jpg,Contentment,Amusement,0
+data/emoset_1000/amusement_03087.jpg,Contentment,Amusement,0

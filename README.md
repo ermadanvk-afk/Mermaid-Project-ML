@@ -29,9 +29,9 @@ Implementing enterprise-grade research on consumer hardware required several cri
 **The Problem:** The original authors utilized InstructPix2Pix requiring 100 denoising steps per emotion. In a multi-agent loop generating 6-8 images, this equates to 600-800 steps per image evaluated—rendering the process impractically slow.
 **The Solution:** We integrated a **Latent Consistency Model (LCM) LoRA** into the Diffusion pipeline. By switching to `LCMScheduler`, we achieve equivalent visual edits in just **4 denoising steps**, accelerating the entire Visual Augmentation agent by over 20x.
 
-### 4. Simulating Proprietary Emotion Embeddings
-**The Problem:** The paper injects emotion embeddings directly into InstructPix2Pix using a proprietary, custom-trained Q-Former ("Emotion Adapter"). Because these weights are not available for standard Hugging Face pipelines, we could not replicate this exactly.
-**The Solution:** We engineered a textual workaround, translating the latent injection into explicit English instructions (e.g., `prompt = f"alter the image to express a strong feeling of {emotion}"`), allowing us to use standard open-source pipelines.
+### 4. Actual 12-Layer Q-Former Integration (EmoEdit Emotion Adapter)
+**The Requirement:** The MERMAID paper uses a 12-layer Q-Former pretrained by Yang et al. (*EmoEdit*, CVPR) with 76 query tokens and hidden size 768. The Q-Former fuses CLIP image and target emotion text embeddings into 77 prompt tokens (`prompt_embeds`), directly conditioning `InstructPix2Pix`.
+**The Implementation:** We implemented the exact `CombinedModel(76)` architecture (`core/qformer.py`) and integrated it into our `MemoryOrchestrator` (`core/memory_manager.py`) and `AugmentationAgent` (`agents/augmentation.py`). InstructPix2Pix is conditioned directly on the cross-modal Q-Former embeddings (`prompt_embeds`), fully eliminating the previous text heuristic and matching the paper's actual visual augmentation pipeline.
 
 ---
 

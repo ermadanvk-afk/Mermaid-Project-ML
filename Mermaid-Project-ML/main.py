@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 from langgraph.graph import StateGraph, END
 from core.state import MERMAIDState
 from core.memory_manager import MemoryOrchestrator
@@ -72,13 +73,6 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     def visual_reflection_node(state: MERMAIDState):
         return run_visual_reflection(state, memory_manager)
 
-    def cleanup_node(state: MERMAIDState):
-        """Removes temporary reference images generated during augmentation."""
-        print("--- [Cleanup] Removing temporary reference images ---")
-        if os.path.exists("generated_refs"):
-            shutil.rmtree("generated_refs")
-        return {"reference_images": {}}
-
     # --- Graph assembly ------------------------------------------------------
 
     workflow = StateGraph(MERMAIDState)
@@ -90,7 +84,6 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     workflow.add_node("augmentation",           augmentation_node)          # Block 3
     workflow.add_node("visual_reflection",      visual_reflection_node)     # Block 3
     workflow.add_node("decision_after_visual",  decision_after_visual_node) # Block 3 inner
-    workflow.add_node("cleanup",                cleanup_node)
 
     # --- Routing functions ---------------------------------------------------
 
@@ -101,7 +94,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
           needs_revision → call Decision Agent again with Qtext guidance.
         """
         if state.get("textual_feedback", {}).get("status") == "good_enough":
-            return "cleanup"
+            return END
         return "decision_after_text"
 
     def route_after_visual_reflection(state: MERMAIDState) -> str:
@@ -114,7 +107,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
             state.get("visual_feedback", {}).get("status") == "good_enough"
             or state["iteration"] >= state["max_iterations"]
         ):
-            return "cleanup"
+            return END
         return "decision_after_visual"
 
     def route_after_decision_after_visual(state: MERMAIDState) -> str:
@@ -135,13 +128,16 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
           2. After Decision[Qvis]            — query_mode == "qvis"
 
         In both cases the routing logic is the same:
-          good_enough   → cleanup
+          good_enough   → END
           needs_revision → decision_after_text (which then goes to augmentation)
 
         Iteration is incremented here only when we're re-entering the loop.
         """
-        if state.get("textual_feedback", {}).get("status") == "good_enough":
-            return "cleanup"
+        if (
+            state.get("textual_feedback", {}).get("status") == "good_enough"
+            or state.get("iteration", 0) >= state.get("max_iterations", 3)
+        ):
+            return END
         # If we came from the visual loop, increment iteration counter
         # (Algorithm 1: the for-loop counter advances each time we loop back)
         return "decision_after_text"
@@ -158,7 +154,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         "text_reflection",
         route_after_text_reflection_in_loop,
         {
-            "cleanup": "cleanup",
+            END: END,
             "decision_after_text": "decision_after_text",
         }
     )
@@ -174,7 +170,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         "visual_reflection",
         route_after_visual_reflection,
         {
-            "cleanup": "cleanup",
+            END: END,
             "decision_after_visual": "decision_after_visual",
         }
     )
@@ -187,37 +183,37 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         {"text_reflection": "text_reflection"}
     )
 
-    # Cleanup always exits
-    workflow.add_edge("cleanup", END)
-
     return workflow.compile()
 
 
 if __name__ == "__main__":
     import time
     from core.state import create_initial_state
-    from dataloader.artphoto import load_artphoto
+    from dataloader.emoset import load_emoset
 
     print("=== Initializing Compute-Efficient MERMAID ===")
     
-    # 1. Initialize Memory Orchestrator
-    mem_manager = MemoryOrchestrator(mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct")
+    # 1. Initialize Memory Orchestrator with LLaVA 1.5 7B
+    mem_manager = MemoryOrchestrator(mllm_model_id="llava-hf/llava-1.5-7b-hf")
 
     # 2. Build Graph
     app = build_graph(mem_manager)
 
-    # 3. Load Dataset
-    print(f"\n=== Loading Artphoto Dataset ===")
-    dataset = load_artphoto("data/testImages_artphoto")
+    # 3. Load EmoSet Dataset
+    print(f"\n=== Loading EmoSet Dataset (1000 images) ===")
+    dataset = load_emoset("data/emoset_1000", total_limit=1000)
     
     if not dataset:
         print("Dataset not found or empty. Exiting.")
         exit(1)
         
-    subset = dataset
+    subset = dataset[10:20]
     
-    # Artphoto classes
-    candidate_emotions = ["Amusement", "Anger", "Awe", "Contentment", "Disgust", "Excitement", "Fear", "Sadness"]
+    # EmoSet 8 classes
+    candidate_emotions = [
+        "Amusement", "Anger", "Awe", "Contentment",
+        "Disgust", "Excitement", "Fear", "Sadness"
+    ]
     
     correct_predictions = 0
     total = len(subset)
@@ -227,7 +223,7 @@ if __name__ == "__main__":
     
     # Ensure a results directory exists
     os.makedirs("results", exist_ok=True)
-    csv_filename = "results/artphoto_evaluation_qwen2.5.csv"
+    csv_filename = "results/qformer_emoset_evaluation_llava_1.5_7b.csv"
     
     print(f"\n=== Starting Evaluation on {total} images (Logging to {csv_filename}) ===")
     start_time = time.time()
@@ -253,9 +249,10 @@ if __name__ == "__main__":
             # Run graph
             try:
                 final_state = app.invoke(initial_state)
-                prediction = final_state.get("current_prediction", "")
+                prediction = str(final_state.get("current_prediction") or "")
             except Exception as e:
                 print(f"[Error] Graph failed on image {image_path}: {e}")
+                traceback.print_exc()
                 prediction = "Error"
                 
             is_match = prediction.lower() == ground_truth.lower()
@@ -266,11 +263,17 @@ if __name__ == "__main__":
             # Flush immediately so we don't lose data if it crashes
             csv_file.flush()
             
+            # Clean up reference images AFTER the result is safely written to CSV
+            if os.path.exists("generated_refs"):
+                shutil.rmtree("generated_refs")
+                print(f"--- [Cleanup] Removed generated_refs for image {i+1} ---")
+            
             if is_match:
                 correct_predictions += 1
                 print(f"RESULT: [SUCCESS] Predicted: {prediction} | GT: {ground_truth}")
             else:
                 print(f"RESULT: [FAILED] Predicted: {prediction} | GT: {ground_truth}")
+
             
     end_time = time.time()
     accuracy = (correct_predictions / total) * 100 if total > 0 else 0
