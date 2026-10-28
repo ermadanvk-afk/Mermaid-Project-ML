@@ -38,6 +38,7 @@ def load_emotion6(dataset_root: str = "/kaggle/input", total_limit: int = None) 
     Returns:
         List of dictionaries containing 'image_path' and 'ground_truth' label.
     """
+<<<<<<< HEAD
     resolved_root = dataset_root
     
     # Check if the given root directly contains class folders with images
@@ -66,14 +67,32 @@ def load_emotion6(dataset_root: str = "/kaggle/input", total_limit: int = None) 
     print(f"[Emotion6 Loader] Reading dataset from: {resolved_root}")
 
     # Collect all images grouped by class
+=======
+    if not os.path.exists(dataset_root):
+        print(f"Warning: Emotion6 directory '{dataset_root}' not found.")
+        return []
+        
+    # If dataset_root points to the outer folder containing 'images/', descend into it
+    if os.path.isdir(os.path.join(dataset_root, "images")):
+        dataset_root = os.path.join(dataset_root, "images")
+        
+    # First, collect all images grouped by class
+>>>>>>> 3ad1e63d855509b8bde5996995563a4d6c40f22f
     grouped_data = {}
     for emotion_dir in sorted(os.listdir(resolved_root)):
         dir_path = os.path.join(resolved_root, emotion_dir)
         if os.path.isdir(dir_path):
+<<<<<<< HEAD
             images = []
             for img_ext in valid_exts:
                 for img_path in glob.glob(os.path.join(dir_path, img_ext)):
                     images.append({
+=======
+            grouped_data[emotion_dir] = []
+            for img_ext in ["*.jpg", "*.jpeg", "*.png"]:
+                for img_path in sorted(glob.glob(os.path.join(dir_path, img_ext))):
+                    grouped_data[emotion_dir].append({
+>>>>>>> 3ad1e63d855509b8bde5996995563a4d6c40f22f
                         "image_path": img_path,
                         "ground_truth": emotion_dir.capitalize()
                     })

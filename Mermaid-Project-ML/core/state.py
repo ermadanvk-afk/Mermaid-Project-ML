@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from typing import TypedDict, List, Dict, Optional, Literal
 
 FeedbackStatus = Literal["good_enough", "needs_revision"]
@@ -54,12 +55,16 @@ class MERMAIDState(TypedDict):
 
     # Generated assets
     reference_images: Dict[str, str]
+    # Cached captions for each reference image (reused across visual reflection iterations)
+    reference_captions: Dict[str, str]
+    use_qformer: Optional[bool]
 
 
 def create_initial_state(
     image_path: str,
     candidate_emotions: List[str],
     max_iterations: int = 3,
+    use_qformer: Optional[bool] = None,
 ) -> MERMAIDState:
     """
     Initialize the state for a new image inference request.
@@ -77,6 +82,9 @@ def create_initial_state(
     if max_iterations <= 0:
         raise ValueError("max_iterations must be greater than zero.")
 
+    if use_qformer is None:
+        use_qformer = os.path.exists("checkpoint/Q-Former.pth")
+
     return {
         "image_path": image_path,
         "candidate_emotions": list(candidate_emotions),
@@ -88,6 +96,8 @@ def create_initial_state(
         "textual_feedback": None,
         "visual_feedback": None,
         "reference_images": {},
+        "reference_captions": {},
+        "use_qformer": use_qformer,
     }
 
 
