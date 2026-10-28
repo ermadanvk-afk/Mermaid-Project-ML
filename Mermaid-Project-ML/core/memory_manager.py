@@ -1,16 +1,39 @@
+import os
 import torch
 import gc
-from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration, BitsAndBytesConfig
+from PIL import Image
+from transformers import (
+    AutoProcessor,
+    LlavaForConditionalGeneration,
+    LlavaProcessor,
+    LlavaNextForConditionalGeneration,
+    LlavaNextProcessor,
+    BitsAndBytesConfig,
+    CLIPModel,
+    CLIPProcessor,
+)
 from diffusers import StableDiffusionInstructPix2PixPipeline, LCMScheduler
 from core.qformer import CombinedModel, resize_image_to_512
 
 
 class MemoryOrchestrator:
     """
-    Manages loading and unloading of models between CPU RAM and GPU VRAM 
-    to prevent Out-Of-Memory errors on constrained hardware (12GB VRAM).
+    Manages loading and unloading of models between CPU RAM and GPU VRAM
+    to prevent Out-Of-Memory errors on constrained hardware (12 GB VRAM).
+
+    MLLM  : LLaVA 1.5 7B (llava-hf/llava-1.5-7b-hf), loaded in
+            4-bit NF4 quantisation via bitsandbytes for multimodal reasoning.
+    Vision: 12-layer Q-Former + CLIP + InstructPix2Pix (with LCM LoRA)
+            for emotion-conditioned visual augmentation.
     """
-    def __init__(self, mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct", diff_model_id="timbrooks/instruct-pix2pix"):
+    def __init__(
+        self,
+        mllm_model_id: str = "llava-hf/llava-1.5-7b-hf",
+        diff_model_id: str = "timbrooks/instruct-pix2pix",
+        clip_model_id: str = "openai/clip-vit-large-patch14",
+        qformer_checkpoint_path: str = "checkpoint/Q-Former.pth",
+        use_lcm: bool = True,
+    ):
         self.mllm_loaded: bool = False
         self.diffusion_loaded: bool = False
         
@@ -24,23 +47,40 @@ class MemoryOrchestrator:
         self.processor = None
         self.diffusion_pipeline = None
         
-        print("[MemoryManager] Initialized. Models will be loaded on demand.")
+        # Q-Former & CLIP components for emotion augmentation
+        self.qformer = None
+        self.clip_model = None
+        self.clip_processor = None
+        
+        print(f"[MemoryManager] Initialized with MLLM={mllm_model_id} & Q-Former. Models will be loaded on demand.")
         
     def _init_mllm(self):
         if self.mllm is None:
-            print(f"[MemoryManager] Initializing MLLM ({self.mllm_model_id}) in 4-bit NF4...")
-            bnb_config = BitsAndBytesConfig(
+            print(f"[MemoryManager] Initializing MLLM ({self.mllm_model_id}) in 4-bit...")
+            quantization_config = BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_quant_type="nf4",
-                bnb_4bit_compute_dtype=torch.float16
+                bnb_4bit_compute_dtype=torch.float16,
             )
-            self.processor = AutoProcessor.from_pretrained(self.mllm_model_id)
+            is_next = "next" in self.mllm_model_id.lower() or "v1.6" in self.mllm_model_id.lower()
+            if is_next:
+                model_cls = LlavaNextForConditionalGeneration
+                proc_cls = LlavaNextProcessor
+            else:
+                model_cls = LlavaForConditionalGeneration
+                proc_cls = LlavaProcessor
+
+            try:
+                self.processor = proc_cls.from_pretrained(self.mllm_model_id)
+            except Exception:
+                self.processor = AutoProcessor.from_pretrained(self.mllm_model_id)
+
             # bitsandbytes 4-bit loads directly to GPU via device_map="auto"
-            self.mllm = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            self.mllm = model_cls.from_pretrained(
                 self.mllm_model_id,
                 quantization_config=quantization_config,
                 device_map="auto",
-                torch_dtype=torch.float16
+                torch_dtype=torch.float16,
             )
 
     def generate_mllm_response(
@@ -127,57 +167,121 @@ class MemoryOrchestrator:
             
     def _init_diffusion(self):
         if self.diffusion_pipeline is None:
-            print(f"[MemoryManager] Initializing Diffusion ({self.diff_model_id}) with LCM...")
+            print(f"[MemoryManager] Initializing Diffusion ({self.diff_model_id})...")
             self.diffusion_pipeline = StableDiffusionInstructPix2PixPipeline.from_pretrained(
-                self.diff_model_id, dtype=torch.float16
+                self.diff_model_id,
+                torch_dtype=torch.float16,
+                safety_checker=None,
+                requires_safety_checker=False,
             )
-            # Replace scheduler with LCM for 2-4 step generation
-            self.diffusion_pipeline.scheduler = LCMScheduler.from_config(self.diffusion_pipeline.scheduler.config)
-            # Load LCM LoRA
-            self.diffusion_pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
-            # Pipeline is instantiated on CPU by default
+            if self.use_lcm:
+                print("[MemoryManager] Integrating LCM Scheduler and LoRA for accelerated augmentation...")
+                self.diffusion_pipeline.scheduler = LCMScheduler.from_config(self.diffusion_pipeline.scheduler.config)
+                self.diffusion_pipeline.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
+                
+            # Enable attention slicing for minimal VRAM footprint
+            self.diffusion_pipeline.enable_attention_slicing()
+            self.diffusion_pipeline.set_progress_bar_config(disable=True)
         
     def load_mllm(self) -> None:
-        """Loads the MLLM to GPU, offloading Diffusion if necessary."""
-        if self.diffusion_loaded:
-            self._offload_diffusion()
-            
+        """Ensures MLLM is loaded on GPU and clears transient cache."""
         if self.mllm is None:
             self._init_mllm()
             self.mllm_loaded = True
-        elif not self.mllm_loaded:
-            print("[MemoryManager] Note: 4-bit MLLM usually remains on GPU. Skipping explicit move.")
-            self.mllm_loaded = True
-            
+        torch.cuda.empty_cache()
+
     def load_diffusion(self) -> None:
-        """Loads the Diffusion model to GPU, offloading MLLM if necessary."""
-        if self.mllm_loaded:
-            self._offload_mllm()
-            
+        """Ensures Diffusion model, CLIP, and Q-Former are loaded on GPU."""
         if self.diffusion_pipeline is None:
             self._init_diffusion()
-            
+        if self.qformer is None:
+            self._init_qformer()
+
         if not self.diffusion_loaded:
-            print("[MemoryManager] Moving Diffusion model to GPU...")
+            print("[MemoryManager] Moving Diffusion pipeline, CLIP, and Q-Former to GPU...")
             self.diffusion_pipeline.to('cuda')
+            self.clip_model.to('cuda')
+            self.qformer.to('cuda')
+            self.qformer.eval()
+            self.clip_model.eval()
             self.diffusion_loaded = True
-            
+        torch.cuda.empty_cache()
+
     def _offload_mllm(self) -> None:
-        """Moves MLLM to CPU and clears CUDA cache."""
-        print("[MemoryManager] Offloading MLLM...")
-        # 4-bit models cannot easily be moved to CPU via .to('cpu').
-        # Given 12GB VRAM, a 4-bit 7B (5GB) and FP16 Diffusion (3GB) can coexist (8GB < 12GB).
-        # We simply clear the cache to ensure we have maximum free space before running Diffusion.
+        """Cleans transient CUDA cache."""
         torch.cuda.empty_cache()
         gc.collect()
-        self.mllm_loaded = False
-        
+
     def _offload_diffusion(self) -> None:
-        """Clears CUDA cache to make room. Doesn't strictly move to CPU to avoid fp16 errors."""
-        if self.diffusion_pipeline is not None:
-            print("[MemoryManager] Clearing cache after Diffusion...")
-            # FP16 models complain when moved to CPU. Since 12GB can hold both,
-            # we just clear the CUDA cache and leave it in VRAM.
-            torch.cuda.empty_cache()
-            gc.collect()
-        self.diffusion_loaded = False
+        """Cleans transient CUDA cache after diffusion inference."""
+        torch.cuda.empty_cache()
+        gc.collect()
+
+    def extract_clip_image_embeds(self, image: Image.Image) -> torch.Tensor:
+        """
+        Extracts CLIP image features ONCE per input image (resized to 512 short-side per A5)
+        in torch.float16 on GPU for efficient multi-emotion conditioning.
+        """
+        if not self.diffusion_loaded:
+            self.load_diffusion()
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        resized_img = resize_image_to_512(image)
+        data = self.clip_processor(images=resized_img, return_tensors="pt")
+        with torch.no_grad():
+            pixel_vals = data["pixel_values"].to(device, dtype=torch.float16)
+            img_embeds = self.clip_model.get_image_features(pixel_values=pixel_vals)
+            if img_embeds.dim() == 2:
+                img_embeds = img_embeds.unsqueeze(1)
+        return img_embeds.to(device, dtype=torch.float16)
+
+    def get_emotion_prompt_embeds(
+        self,
+        image_or_emotion,
+        emotion_or_none=None,
+        img_embeds: torch.Tensor = None,
+    ) -> torch.Tensor:
+        """
+        Fuses CLIP image features and target emotion embedding via the 12-layer Q-Former.
+        Accepts:
+          - (image, emotion, img_embeds=...) OR
+          - (emotion, img_embeds=...)
+        Produces prompt embeddings of shape [1, 77, 768] in float16 on GPU.
+        """
+        if not self.diffusion_loaded:
+            self.load_diffusion()
+
+        if emotion_or_none is not None:
+            image = image_or_emotion
+            emotion = emotion_or_none
+        else:
+            if isinstance(image_or_emotion, str):
+                emotion = image_or_emotion
+                image = None
+            else:
+                image = image_or_emotion
+                emotion = None
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        if img_embeds is None:
+            if image is None:
+                raise ValueError("Either image or img_embeds must be supplied to get_emotion_prompt_embeds.")
+            img_embeds = self.extract_clip_image_embeds(image)
+
+        # Extract CLIP text embeddings for target emotion
+        text_data = self.clip_processor(text=emotion, return_tensors="pt", padding="max_length")
+        with torch.no_grad():
+            text_embeds = self.clip_model.get_text_features(
+                input_ids=text_data["input_ids"].to(device)
+            )
+            if text_embeds.dim() == 2:
+                text_embeds = text_embeds.unsqueeze(1)
+
+            # Fuse with 12-layer Q-Former (76 learned query tokens + 1 text embed -> 77 tokens)
+            normal_output = self.qformer(
+                text_embeds=text_embeds.to(device, dtype=torch.float16),
+                img_embeds=img_embeds.to(device, dtype=torch.float16),
+            )
+
+        return normal_output.to(device, dtype=torch.float16)
