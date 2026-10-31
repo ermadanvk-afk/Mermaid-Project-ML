@@ -1,3 +1,5 @@
+import re
+import json
 import torch
 from PIL import Image
 from core.state import MERMAIDState
@@ -20,7 +22,8 @@ def _build_prompt(state: MERMAIDState) -> str:
             "background context, lighting, and colour tones, please analyse the emotional state "
             "represented.\n"
             f'Image Description: "{caption}"\n'
-            "Think carefully and choose only one emotion word from the list above."
+            "Think carefully and choose only one emotion word from the list above.\n"
+            'Respond with ONLY a valid JSON object: {"emotion": "<chosen_label>"}'
         )
     else:
         if query_mode == "qtext":
@@ -39,70 +42,95 @@ def _build_prompt(state: MERMAIDState) -> str:
             f'might be "{suggestion}" based on the following feedback: "{fb_text}". '
             "Please carefully consider this feedback.\n"
             f"Your task is to choose the best emotion label for the image from the following list: "
-            f"{labels}. Output only the chosen emotion word."
+            f"{labels}.\n"
+            'Respond with ONLY a valid JSON object: {"emotion": "<chosen_label>"}'
         )
 
     return text
 
 
-from qwen_vl_utils import process_vision_info
+def _parse_decision_output(
+    raw_output: str,
+    candidate_emotions: list[str],
+    current_prediction: str = None,
+    iteration: int = 0,
+) -> str:
+    """
+    Parses decision agent output (B2 fix):
+    a) First tries parsing JSON {"emotion": "<chosen_label>"}.
+    b) Fallback: finds ALL occurrences of candidate emotions in generated response using
+       word-boundary regex (\\b<label>\\b) and returns the LAST occurring candidate emotion
+       in the text (never the first in candidate_emotions list order!).
+    c) If zero labels match in a revision step (iteration > 0), retains current_prediction
+       instead of blindly defaulting to candidate_emotions[0].
+    """
+    # 1. First try parsing JSON
+    text = raw_output.replace('\\_', '_').strip()
+    if "```json" in text:
+        text = text.split("```json")[1].split("```")[0].strip()
+    elif "```" in text:
+        text = text.split("```")[1].split("```")[0].strip()
+
+    json_match = re.search(r"\{.*?\}", text, re.DOTALL)
+    if json_match:
+        try:
+            parsed = json.loads(json_match.group(0))
+            if isinstance(parsed, dict) and "emotion" in parsed:
+                chosen = str(parsed["emotion"]).strip()
+                for e in candidate_emotions:
+                    if e.lower() == chosen.lower():
+                        return e
+        except Exception:
+            pass
+
+    # 2. Word-boundary regex search across generated response
+    matches = []
+    for emotion in candidate_emotions:
+        pattern = rf"\b{re.escape(emotion)}\b"
+        for m in re.finditer(pattern, raw_output, re.IGNORECASE):
+            matches.append((m.start(), emotion))
+
+    if matches:
+        # Sort by character offset and pick the LAST occurring candidate emotion
+        matches.sort(key=lambda x: x[0])
+        return matches[-1][1]
+
+    # 3. Fallback for zero matches: if iteration > 0, retain current_prediction
+    if iteration > 0 and current_prediction:
+        return current_prediction
+    return candidate_emotions[0]
+
 
 def run_decision_agent(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
     mode = state.get("query_mode", "qinit")
-    print(f"--- [Agent: Decision | mode={mode}] Iteration {state.get('iteration', 0)} ---")
+    iteration = state.get("iteration", 0)
+    current_pred = state.get("current_prediction")
+    candidate_emotions = state["candidate_emotions"]
+    print(f"--- [Agent: Decision | mode={mode}] Iteration {iteration} (LLaVA 1.5 7B) ---")
 
-    # 1. Ensure MLLM is on GPU
-    memory_manager.load_mllm()
-    model     = memory_manager.mllm
-    processor = memory_manager.processor
-
-    # 2. Load image path
+    # 1. Load image and cap resolution (B7 fix: max dim 512x512, max_pixels <= 262144)
     image_path = state["image_path"]
-
-    # 3. Build the mode-appropriate prompt
+    raw_image = Image.open(image_path).convert("RGB")
+    raw_image.thumbnail((512, 512), Image.LANCZOS)
     prompt_text = _build_prompt(state)
 
-    # 4. Prepare Qwen inputs
-    messages = [
-        {
-            "role": "user",
-            "content": [
-                {"type": "image", "image": image_path},
-                {"type": "text", "text": prompt_text},
-            ],
-        }
-    ]
-    
-    text = processor.apply_chat_template(
-        messages, tokenize=False, add_generation_prompt=True
-    )
-    image_inputs, video_inputs = process_vision_info(messages)
-    
-    inputs = processor(
-        text=[text],
-        images=image_inputs,
-        videos=video_inputs,
-        padding=True,
-        return_tensors="pt",
-    ).to(model.device)
-
-    with torch.no_grad():
-        generated_ids = model.generate(**inputs, max_new_tokens=20)
-
-    generated_ids_trimmed = [
-        out_ids[len(in_ids):] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-    ]
-    raw_output = processor.batch_decode(
-        generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
-    )[0].strip()
-
-    # 5. Map raw output to a valid candidate (case-insensitive, fallback to first)
-    prediction = next(
-        (e for e in state["candidate_emotions"] if e.lower() in raw_output.lower()),
-        state["candidate_emotions"][0],
+    # 2. Generate response via LLaVA 1.5 7B chat-template pipeline
+    raw_output = memory_manager.generate_mllm_response(
+        image=raw_image,
+        prompt_text=prompt_text,
+        max_new_tokens=60,
+        repetition_penalty=1.15,
+        no_repeat_ngram_size=0,
     )
 
-    print(f"    -> Predicted: '{prediction}'  (raw: '{raw_output}')")
+    # 3. Map raw output using B2 two-layer parser
+    prediction = _parse_decision_output(
+        raw_output=raw_output,
+        candidate_emotions=candidate_emotions,
+        current_prediction=current_pred,
+        iteration=iteration,
+    )
 
+    print(f"    -> Predicted: '{prediction}'  (raw: '{raw_output.strip()}')")
     return {"current_prediction": prediction}
 

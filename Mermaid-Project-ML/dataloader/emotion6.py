@@ -18,6 +18,10 @@ def load_emotion6(dataset_root: str, total_limit: int = None) -> list[dict]:
         print(f"Warning: Emotion6 directory '{dataset_root}' not found.")
         return []
         
+    # If dataset_root points to the outer folder containing 'images/', descend into it
+    if os.path.isdir(os.path.join(dataset_root, "images")):
+        dataset_root = os.path.join(dataset_root, "images")
+        
     # First, collect all images grouped by class
     grouped_data = {}
     for emotion_dir in sorted(os.listdir(dataset_root)):
@@ -25,7 +29,7 @@ def load_emotion6(dataset_root: str, total_limit: int = None) -> list[dict]:
         if os.path.isdir(dir_path):
             grouped_data[emotion_dir] = []
             for img_ext in ["*.jpg", "*.jpeg", "*.png"]:
-                for img_path in glob.glob(os.path.join(dir_path, img_ext)):
+                for img_path in sorted(glob.glob(os.path.join(dir_path, img_ext))):
                     grouped_data[emotion_dir].append({
                         "image_path": img_path,
                         "ground_truth": emotion_dir.capitalize()

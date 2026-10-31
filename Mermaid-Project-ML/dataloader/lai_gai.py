@@ -1,35 +1,56 @@
 import os
-import csv
+import re
 
-def load_lai_gai(dataset_root: str, annotations_file: str) -> list[dict]:
+
+def load_lai_gai(dataset_root: str, total_limit: int = None) -> list[dict]:
     """
-    Loads the LAI-GAI fairness dataset.
-    Because LAI-GAI tracks specific demographic ratings, we assume an 
-    annotations CSV file detailing the images and cohort data.
-    
+    Loads the LAI-GAI dataset by extracting emotion labels from filenames using regex.
+    Expected filename format: <digit>_<emotion>.png (e.g., '000_Craving.png', '013_Nurturant love.png').
+
     Args:
-        dataset_root: Path to the root folder containing the images.
-        annotations_file: Path to the CSV containing image-to-cohort metadata.
-        
+        dataset_root: Path to the directory containing LAI-GAI images.
+        total_limit: Optional limit distributed evenly across emotion classes.
+
     Returns:
-        List of dictionaries containing 'image_path', 'ground_truth', and 'cohort' metadata.
+        List of dictionaries with 'image_path' and 'ground_truth'.
     """
-    data = []
-    if not os.path.exists(annotations_file):
-        print(f"Warning: LAI-GAI annotations file '{annotations_file}' not found.")
-        return data
-        
-    # Assuming standard CSV format: image_filename, emotion_label, demographic_cohort
-    with open(annotations_file, mode='r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            filename = row.get('image_filename', '')
+    if not os.path.exists(dataset_root):
+        print(f"Warning: LAI-GAI directory '{dataset_root}' not found.")
+        return []
+
+    # Regex matching: digits followed by underscore and emotion label
+    pattern = re.compile(r"^\d+_(.+)\.(?:png|jpg|jpeg)$", re.IGNORECASE)
+    grouped_data = {}
+
+    for filename in sorted(os.listdir(dataset_root)):
+        match = pattern.match(filename)
+        if match:
+            emotion = match.group(1).strip().capitalize()
             img_path = os.path.join(dataset_root, filename)
-            
-            if os.path.exists(img_path) and filename:
-                data.append({
-                    "image_path": img_path,
-                    "ground_truth": row.get('emotion_label', '').capitalize(),
-                    "cohort": row.get('demographic_cohort', 'unknown')
-                })
-    return data
+            grouped_data.setdefault(emotion, []).append({
+                "image_path": img_path,
+                "ground_truth": emotion,
+            })
+
+    if not grouped_data:
+        return []
+
+    # Return all images if no limit is specified
+    if total_limit is None:
+        flat_data = []
+        for class_list in grouped_data.values():
+            flat_data.extend(class_list)
+        return flat_data
+
+    # Distribute total_limit evenly across classes
+    num_classes = len(grouped_data)
+    base_quota = total_limit // num_classes
+    remainder = total_limit % num_classes
+
+    final_data = []
+    for i, emotion in enumerate(sorted(grouped_data.keys())):
+        quota = base_quota + (1 if i < remainder else 0)
+        class_images = grouped_data[emotion]
+        final_data.extend(class_images[: min(quota, len(class_images))])
+
+    return final_data

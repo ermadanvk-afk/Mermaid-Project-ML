@@ -1,0 +1,848 @@
+image_path,predicted_emotion,ground_truth,is_correct
+data/lai_gai_labeled_images/000_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/001_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/154_Craving.png,Amusement,Craving,0
+data/lai_gai_labeled_images/155_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/156_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/157_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/158_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/159_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/160_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/161_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/435_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/436_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/437_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/438_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/439_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/440_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/441_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/442_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/443_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/444_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/445_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/446_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/447_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/448_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/449_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/450_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/451_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/452_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/453_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/454_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/455_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/456_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/457_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/458_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/459_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/460_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/461_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/462_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/463_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/464_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/465_Craving.png,Amusement,Craving,0
+data/lai_gai_labeled_images/466_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/467_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/468_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/469_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/470_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/471_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/472_Craving.png,Joy,Craving,0
+data/lai_gai_labeled_images/473_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/474_Craving.png,Craving,Craving,1
+data/lai_gai_labeled_images/002_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/003_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/005_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/006_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/007_Disgust.png,Error,Disgust,0
+data/lai_gai_labeled_images/008_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/009_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/010_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/011_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/012_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/193_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/194_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/195_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/196_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/197_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/198_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/327_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/328_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/329_Disgust.png,Neutral,Disgust,0
+data/lai_gai_labeled_images/330_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/331_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/332_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/333_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/434_Disgust.png,Neutral,Disgust,0
+data/lai_gai_labeled_images/476_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/477_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/478_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/479_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/480_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/481_Disgust.png,Amusement,Disgust,0
+data/lai_gai_labeled_images/482_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/483_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/484_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/485_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/486_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/487_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/488_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/501_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/505_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/506_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/507_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/508_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/509_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/510_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/511_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/512_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/624_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/625_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/626_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/712_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/713_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/714_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/715_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/716_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/717_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/718_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/719_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/720_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/733_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/746_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/747_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/748_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/749_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/750_Disgust.png,Awe,Disgust,0
+data/lai_gai_labeled_images/751_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/752_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/753_Disgust.png,Sadness,Disgust,0
+data/lai_gai_labeled_images/790_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/791_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/792_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/793_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/794_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/843_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/844_Disgust.png,Disgust,Disgust,1
+data/lai_gai_labeled_images/845_Disgust.png,Fear,Disgust,0
+data/lai_gai_labeled_images/004_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/014_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/110_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/111_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/112_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/113_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/114_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/115_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/116_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/126_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/127_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/128_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/129_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/130_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/131_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/132_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/133_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/134_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/135_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/136_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/137_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/138_Fear.png,Anger,Fear,0
+data/lai_gai_labeled_images/139_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/190_Fear.png,Disgust,Fear,0
+data/lai_gai_labeled_images/334_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/335_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/336_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/337_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/338_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/339_Fear.png,Amusement,Fear,0
+data/lai_gai_labeled_images/340_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/588_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/589_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/590_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/591_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/592_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/593_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/594_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/595_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/596_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/597_Fear.png,Amusement,Fear,0
+data/lai_gai_labeled_images/598_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/599_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/600_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/601_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/602_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/603_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/604_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/605_Fear.png,Amusement,Fear,0
+data/lai_gai_labeled_images/606_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/607_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/608_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/609_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/610_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/611_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/612_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/613_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/614_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/615_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/616_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/617_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/754_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/830_Fear.png,Neutral,Fear,0
+data/lai_gai_labeled_images/831_Fear.png,Neutral,Fear,0
+data/lai_gai_labeled_images/832_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/833_Fear.png,Neutral,Fear,0
+data/lai_gai_labeled_images/834_Fear.png,Fear,Fear,1
+data/lai_gai_labeled_images/835_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/836_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/837_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/838_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/839_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/840_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/841_Fear.png,Amusement,Fear,0
+data/lai_gai_labeled_images/842_Fear.png,Awe,Fear,0
+data/lai_gai_labeled_images/013_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/044_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/045_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/046_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/047_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/065_Nurturant love.png,Neutral,Nurturant love,0
+data/lai_gai_labeled_images/066_Nurturant love.png,Neutral,Nurturant love,0
+data/lai_gai_labeled_images/342_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/381_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/382_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/389_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/390_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/413_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/414_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/415_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/416_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/417_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/418_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/419_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/420_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/421_Nurturant love.png,Amusement,Nurturant love,0
+data/lai_gai_labeled_images/422_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/423_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/424_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/425_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/426_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/427_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/428_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/429_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/430_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/431_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/432_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/433_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/489_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/493_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/494_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/495_Nurturant love.png,Amusement,Nurturant love,0
+data/lai_gai_labeled_images/496_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/497_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/498_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/499_Nurturant love.png,Amusement,Nurturant love,0
+data/lai_gai_labeled_images/500_Nurturant love.png,Amusement,Nurturant love,0
+data/lai_gai_labeled_images/620_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/628_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/700_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/709_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/711_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/755_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/756_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/757_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/758_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/759_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/760_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/761_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/762_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/763_Nurturant love.png,Nurturant love,Nurturant love,1
+data/lai_gai_labeled_images/764_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/765_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/766_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/783_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/819_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/820_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/821_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/822_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/823_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/824_Nurturant love.png,Joy,Nurturant love,0
+data/lai_gai_labeled_images/825_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/826_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/827_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/828_Nurturant love.png,Attachment love,Nurturant love,0
+data/lai_gai_labeled_images/015_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/016_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/017_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/018_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/019_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/020_Neutral.png,Joy,Neutral,0
+data/lai_gai_labeled_images/021_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/022_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/023_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/024_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/025_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/026_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/027_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/028_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/029_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/030_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/031_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/032_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/033_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/034_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/035_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/036_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/037_Neutral.png,Nurturant love,Neutral,0
+data/lai_gai_labeled_images/038_Neutral.png,Nurturant love,Neutral,0
+data/lai_gai_labeled_images/039_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/040_Neutral.png,Nurturant love,Neutral,0
+data/lai_gai_labeled_images/041_Neutral.png,Nurturant love,Neutral,0
+data/lai_gai_labeled_images/042_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/043_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/067_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/068_Neutral.png,Sadness,Neutral,0
+data/lai_gai_labeled_images/069_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/070_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/071_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/072_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/073_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/074_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/075_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/076_Neutral.png,Joy,Neutral,0
+data/lai_gai_labeled_images/077_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/078_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/079_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/081_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/082_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/083_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/084_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/085_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/086_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/087_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/117_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/118_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/119_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/120_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/121_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/122_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/123_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/124_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/125_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/140_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/141_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/142_Neutral.png,Excitement,Neutral,0
+data/lai_gai_labeled_images/143_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/144_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/145_Neutral.png,Excitement,Neutral,0
+data/lai_gai_labeled_images/146_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/147_Neutral.png,Awe,Neutral,0
+data/lai_gai_labeled_images/148_Neutral.png,Excitement,Neutral,0
+data/lai_gai_labeled_images/149_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/150_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/151_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/152_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/153_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/162_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/163_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/164_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/744_Neutral.png,Neutral,Neutral,1
+data/lai_gai_labeled_images/745_Neutral.png,Amusement,Neutral,0
+data/lai_gai_labeled_images/048_Sadness.png,Joy,Sadness,0
+data/lai_gai_labeled_images/049_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/088_Sadness.png,Attachment love,Sadness,0
+data/lai_gai_labeled_images/089_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/090_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/091_Sadness.png,Attachment love,Sadness,0
+data/lai_gai_labeled_images/092_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/093_Sadness.png,Attachment love,Sadness,0
+data/lai_gai_labeled_images/094_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/095_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/096_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/097_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/098_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/099_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/100_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/101_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/102_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/175_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/176_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/177_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/178_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/179_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/180_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/181_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/182_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/183_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/184_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/185_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/186_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/187_Sadness.png,Disgust,Sadness,0
+data/lai_gai_labeled_images/188_Sadness.png,Disgust,Sadness,0
+data/lai_gai_labeled_images/189_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/191_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/192_Sadness.png,Disgust,Sadness,0
+data/lai_gai_labeled_images/341_Sadness.png,Disgust,Sadness,0
+data/lai_gai_labeled_images/475_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/490_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/491_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/492_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/502_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/503_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/504_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/580_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/581_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/582_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/583_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/584_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/585_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/586_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/587_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/621_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/622_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/623_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/721_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/722_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/723_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/724_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/725_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/726_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/727_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/728_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/729_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/730_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/731_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/732_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/734_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/735_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/736_Sadness.png,Amusement,Sadness,0
+data/lai_gai_labeled_images/737_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/738_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/739_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/740_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/741_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/742_Sadness.png,Sadness,Sadness,1
+data/lai_gai_labeled_images/743_Sadness.png,Fear,Sadness,0
+data/lai_gai_labeled_images/050_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/051_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/052_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/053_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/054_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/055_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/056_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/057_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/058_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/080_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/103_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/104_Attachment love.png,Neutral,Attachment love,0
+data/lai_gai_labeled_images/105_Attachment love.png,Neutral,Attachment love,0
+data/lai_gai_labeled_images/106_Attachment love.png,Neutral,Attachment love,0
+data/lai_gai_labeled_images/107_Attachment love.png,Amusement,Attachment love,0
+data/lai_gai_labeled_images/108_Attachment love.png,Neutral,Attachment love,0
+data/lai_gai_labeled_images/109_Attachment love.png,Amusement,Attachment love,0
+data/lai_gai_labeled_images/344_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/345_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/346_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/347_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/348_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/349_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/350_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/351_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/352_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/353_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/354_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/355_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/356_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/357_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/358_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/359_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/360_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/361_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/362_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/363_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/364_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/365_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/366_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/367_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/368_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/369_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/370_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/371_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/372_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/373_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/374_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/375_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/376_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/377_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/378_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/379_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/380_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/383_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/384_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/385_Attachment love.png,Nurturant love,Attachment love,0
+data/lai_gai_labeled_images/386_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/387_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/388_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/391_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/392_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/698_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/699_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/702_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/703_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/704_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/705_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/706_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/707_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/708_Attachment love.png,Attachment love,Attachment love,1
+data/lai_gai_labeled_images/710_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/795_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/829_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/846_Attachment love.png,Joy,Attachment love,0
+data/lai_gai_labeled_images/059_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/060_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/061_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/062_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/063_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/064_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/165_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/199_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/221_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/228_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/229_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/230_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/231_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/232_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/233_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/242_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/243_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/244_Joy.png,Amusement,Joy,0
+data/lai_gai_labeled_images/245_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/629_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/630_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/631_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/632_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/633_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/634_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/635_Joy.png,Attachment love,Joy,0
+data/lai_gai_labeled_images/636_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/637_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/638_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/639_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/640_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/641_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/642_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/643_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/644_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/645_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/646_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/647_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/648_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/649_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/650_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/651_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/652_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/653_Joy.png,Amusement,Joy,0
+data/lai_gai_labeled_images/654_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/655_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/656_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/657_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/658_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/659_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/660_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/661_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/662_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/663_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/664_Joy.png,Awe,Joy,0
+data/lai_gai_labeled_images/665_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/666_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/667_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/668_Joy.png,Attachment love,Joy,0
+data/lai_gai_labeled_images/669_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/670_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/671_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/672_Joy.png,Attachment love,Joy,0
+data/lai_gai_labeled_images/673_Joy.png,Attachment love,Joy,0
+data/lai_gai_labeled_images/674_Joy.png,Attachment love,Joy,0
+data/lai_gai_labeled_images/675_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/676_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/677_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/678_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/679_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/680_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/681_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/682_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/683_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/701_Joy.png,Joy,Joy,1
+data/lai_gai_labeled_images/166_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/167_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/168_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/169_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/170_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/171_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/172_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/173_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/513_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/514_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/515_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/516_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/517_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/518_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/519_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/520_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/521_Excitement.png,Awe,Excitement,0
+data/lai_gai_labeled_images/522_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/523_Excitement.png,Awe,Excitement,0
+data/lai_gai_labeled_images/524_Excitement.png,Awe,Excitement,0
+data/lai_gai_labeled_images/525_Excitement.png,Fear,Excitement,0
+data/lai_gai_labeled_images/526_Excitement.png,Fear,Excitement,0
+data/lai_gai_labeled_images/527_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/528_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/529_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/530_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/531_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/532_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/533_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/534_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/535_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/536_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/537_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/538_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/539_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/540_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/541_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/542_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/543_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/544_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/545_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/546_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/547_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/548_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/549_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/550_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/551_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/552_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/553_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/554_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/555_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/556_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/557_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/558_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/559_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/560_Excitement.png,Amusement,Excitement,0
+data/lai_gai_labeled_images/561_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/562_Excitement.png,Joy,Excitement,0
+data/lai_gai_labeled_images/563_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/564_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/565_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/566_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/567_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/568_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/569_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/570_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/571_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/572_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/573_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/574_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/575_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/576_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/577_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/578_Excitement.png,Excitement,Excitement,1
+data/lai_gai_labeled_images/579_Excitement.png,Amusement,Excitement,0
+data/lai_gai_labeled_images/174_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/271_Anger.png,Anger,Anger,1
+data/lai_gai_labeled_images/272_Anger.png,Anger,Anger,1
+data/lai_gai_labeled_images/273_Anger.png,Anger,Anger,1
+data/lai_gai_labeled_images/274_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/275_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/276_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/277_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/278_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/279_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/280_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/281_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/282_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/283_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/284_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/285_Anger.png,Anger,Anger,1
+data/lai_gai_labeled_images/286_Anger.png,Anger,Anger,1
+data/lai_gai_labeled_images/287_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/288_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/289_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/290_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/291_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/292_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/293_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/294_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/295_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/296_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/297_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/298_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/299_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/300_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/301_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/302_Anger.png,Awe,Anger,0
+data/lai_gai_labeled_images/303_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/304_Anger.png,Awe,Anger,0
+data/lai_gai_labeled_images/305_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/306_Anger.png,Awe,Anger,0
+data/lai_gai_labeled_images/307_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/308_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/309_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/310_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/311_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/312_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/313_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/314_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/315_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/316_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/317_Anger.png,Excitement,Anger,0
+data/lai_gai_labeled_images/318_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/319_Anger.png,Awe,Anger,0
+data/lai_gai_labeled_images/320_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/321_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/322_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/323_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/324_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/325_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/326_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/618_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/619_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/627_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/686_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/688_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/689_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/690_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/691_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/692_Anger.png,Disgust,Anger,0
+data/lai_gai_labeled_images/693_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/694_Anger.png,Sadness,Anger,0
+data/lai_gai_labeled_images/784_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/785_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/786_Anger.png,Amusement,Anger,0
+data/lai_gai_labeled_images/787_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/788_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/789_Anger.png,Neutral,Anger,0
+data/lai_gai_labeled_images/796_Anger.png,Fear,Anger,0
+data/lai_gai_labeled_images/200_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/201_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/202_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/203_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/204_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/205_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/206_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/207_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/208_Amusement.png,Attachment love,Amusement,0
+data/lai_gai_labeled_images/209_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/210_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/211_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/212_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/213_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/214_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/215_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/216_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/217_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/218_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/219_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/220_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/222_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/223_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/224_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/225_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/226_Amusement.png,Attachment love,Amusement,0
+data/lai_gai_labeled_images/227_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/234_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/235_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/236_Amusement.png,Attachment love,Amusement,0
+data/lai_gai_labeled_images/237_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/238_Amusement.png,Awe,Amusement,0
+data/lai_gai_labeled_images/239_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/240_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/241_Amusement.png,Excitement,Amusement,0
+data/lai_gai_labeled_images/246_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/247_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/248_Amusement.png,Sadness,Amusement,0
+data/lai_gai_labeled_images/249_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/250_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/251_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/252_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/253_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/254_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/255_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/256_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/257_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/258_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/259_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/260_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/261_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/262_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/263_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/264_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/265_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/266_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/267_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/268_Amusement.png,Excitement,Amusement,0
+data/lai_gai_labeled_images/269_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/270_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/343_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/797_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/798_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/799_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/800_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/801_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/802_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/803_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/811_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/812_Amusement.png,Attachment love,Amusement,0
+data/lai_gai_labeled_images/813_Amusement.png,Joy,Amusement,0
+data/lai_gai_labeled_images/814_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/815_Amusement.png,Neutral,Amusement,0
+data/lai_gai_labeled_images/816_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/817_Amusement.png,Amusement,Amusement,1
+data/lai_gai_labeled_images/393_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/394_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/395_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/396_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/397_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/398_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/399_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/400_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/401_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/402_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/403_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/404_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/405_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/406_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/407_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/408_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/409_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/410_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/411_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/412_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/684_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/685_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/687_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/695_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/696_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/697_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/767_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/768_Awe.png,Amusement,Awe,0
+data/lai_gai_labeled_images/769_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/770_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/771_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/772_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/773_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/774_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/775_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/776_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/777_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/778_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/779_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/780_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/781_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/782_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/804_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/805_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/806_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/807_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/808_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/809_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/810_Awe.png,Awe,Awe,1
+data/lai_gai_labeled_images/818_Awe.png,Awe,Awe,1

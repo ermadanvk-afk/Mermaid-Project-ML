@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 from langgraph.graph import StateGraph, END
 from core.state import MERMAIDState
 from core.memory_manager import MemoryOrchestrator
@@ -72,13 +73,6 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     def visual_reflection_node(state: MERMAIDState):
         return run_visual_reflection(state, memory_manager)
 
-    def cleanup_node(state: MERMAIDState):
-        """Removes temporary reference images generated during augmentation."""
-        print("--- [Cleanup] Removing temporary reference images ---")
-        if os.path.exists("generated_refs"):
-            shutil.rmtree("generated_refs")
-        return {"reference_images": {}}
-
     # --- Graph assembly ------------------------------------------------------
 
     workflow = StateGraph(MERMAIDState)
@@ -90,39 +84,38 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     workflow.add_node("augmentation",           augmentation_node)          # Block 3
     workflow.add_node("visual_reflection",      visual_reflection_node)     # Block 3
     workflow.add_node("decision_after_visual",  decision_after_visual_node) # Block 3 inner
-    workflow.add_node("cleanup",                cleanup_node)
 
     # --- Routing functions ---------------------------------------------------
 
     def route_after_text_reflection(state: MERMAIDState) -> str:
         """
         After text reflection:
-          good_enough   → accept current prediction, exit.
-          needs_revision → call Decision Agent again with Qtext guidance.
+        good_enough   → accept current prediction, exit.
+        needs_revision → call Decision Agent again with Qtext guidance.
         """
         if state.get("textual_feedback", {}).get("status") == "good_enough":
-            return "cleanup"
+            return END
         return "decision_after_text"
 
     def route_after_visual_reflection(state: MERMAIDState) -> str:
         """
         After visual reflection:
-          good_enough or max_iterations reached → accept, exit.
-          needs_revision → call Decision Agent with Qvis guidance.
+        good_enough or max_iterations reached → accept, exit.
+        needs_revision → call Decision Agent with Qvis guidance.
         """
         if (
             state.get("visual_feedback", {}).get("status") == "good_enough"
             or state["iteration"] >= state["max_iterations"]
         ):
-            return "cleanup"
+            return END
         return "decision_after_visual"
 
     def route_after_decision_after_visual(state: MERMAIDState) -> str:
         """
         After Decision[Qvis], run Text Reflection again (Algorithm 1, Line 15).
         Then:
-          good_enough   → exit.
-          needs_revision → increment iteration, Decision[Qtext] → Augmentation (new loop).
+        good_enough   → exit.
+        needs_revision → increment iteration, Decision[Qtext] → Augmentation (new loop).
         The text_reflection node will be reused; its routing handles the branching.
         """
         # Always go to text_reflection to cross-verify (Algorithm 1, Line 15)
@@ -131,17 +124,20 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     def route_after_text_reflection_in_loop(state: MERMAIDState) -> str:
         """
         Text reflection can be reached from two paths:
-          1. After initial decision (Block 2) — query_mode == "qinit"
-          2. After Decision[Qvis]            — query_mode == "qvis"
+        1. After initial decision (Block 2) — query_mode == "qinit"
+        2. After Decision[Qvis]            — query_mode == "qvis"
 
         In both cases the routing logic is the same:
-          good_enough   → cleanup
-          needs_revision → decision_after_text (which then goes to augmentation)
+        good_enough   → END
+        needs_revision → decision_after_text (which then goes to augmentation)
 
         Iteration is incremented here only when we're re-entering the loop.
         """
-        if state.get("textual_feedback", {}).get("status") == "good_enough":
-            return "cleanup"
+        if (
+            state.get("textual_feedback", {}).get("status") == "good_enough"
+            or state.get("iteration", 0) >= state.get("max_iterations", 3)
+        ):
+            return END
         # If we came from the visual loop, increment iteration counter
         # (Algorithm 1: the for-loop counter advances each time we loop back)
         return "decision_after_text"
@@ -158,7 +154,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         "text_reflection",
         route_after_text_reflection_in_loop,
         {
-            "cleanup": "cleanup",
+            END: END,
             "decision_after_text": "decision_after_text",
         }
     )
@@ -174,7 +170,7 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         "visual_reflection",
         route_after_visual_reflection,
         {
-            "cleanup": "cleanup",
+            END: END,
             "decision_after_visual": "decision_after_visual",
         }
     )
@@ -187,28 +183,25 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         {"text_reflection": "text_reflection"}
     )
 
-    # Cleanup always exits
-    workflow.add_edge("cleanup", END)
-
     return workflow.compile()
 
 
 if __name__ == "__main__":
     import time
     from core.state import create_initial_state
-    from dataloader.artphoto import load_artphoto
+    from dataloader.lai_gai import load_lai_gai
 
     print("=== Initializing Compute-Efficient MERMAID ===")
     
-    # 1. Initialize Memory Orchestrator
-    mem_manager = MemoryOrchestrator(mllm_model_id="Qwen/Qwen2.5-VL-7B-Instruct")
+    # 1. Initialize Memory Orchestrator with LLaVA 1.5 7B (as used in the paper)
+    mem_manager = MemoryOrchestrator(mllm_model_id="llava-hf/llava-1.5-7b-hf")
 
     # 2. Build Graph
     app = build_graph(mem_manager)
 
-    # 3. Load Dataset
-    print(f"\n=== Loading Artphoto Dataset ===")
-    dataset = load_artphoto("data/testImages_artphoto")
+    # 3. Load LAI-GAI Dataset
+    print(f"\n=== Loading LAI-GAI Dataset ===")
+    dataset = load_lai_gai("data/lai_gai_labeled_images")
     
     if not dataset:
         print("Dataset not found or empty. Exiting.")
@@ -216,8 +209,8 @@ if __name__ == "__main__":
         
     subset = dataset
     
-    # Artphoto classes
-    candidate_emotions = ["Amusement", "Anger", "Awe", "Contentment", "Disgust", "Excitement", "Fear", "Sadness"]
+    # LAI-GAI 12 classes
+    candidate_emotions = sorted(list(set(item["ground_truth"] for item in dataset)))
     
     correct_predictions = 0
     total = len(subset)
@@ -227,7 +220,7 @@ if __name__ == "__main__":
     
     # Ensure a results directory exists
     os.makedirs("results", exist_ok=True)
-    csv_filename = "results/artphoto_evaluation_qwen2.5.csv"
+    csv_filename = "results/laigai_evaluation_llava_1.5_7b.csv"
     
     print(f"\n=== Starting Evaluation on {total} images (Logging to {csv_filename}) ===")
     start_time = time.time()
@@ -253,9 +246,10 @@ if __name__ == "__main__":
             # Run graph
             try:
                 final_state = app.invoke(initial_state)
-                prediction = final_state.get("current_prediction", "")
+                prediction = str(final_state.get("current_prediction") or "")
             except Exception as e:
                 print(f"[Error] Graph failed on image {image_path}: {e}")
+                traceback.print_exc()
                 prediction = "Error"
                 
             is_match = prediction.lower() == ground_truth.lower()
@@ -266,11 +260,17 @@ if __name__ == "__main__":
             # Flush immediately so we don't lose data if it crashes
             csv_file.flush()
             
+            # Clean up reference images AFTER the result is safely written to CSV
+            if os.path.exists("generated_refs"):
+                shutil.rmtree("generated_refs")
+                print(f"--- [Cleanup] Removed generated_refs for image {i+1} ---")
+            
             if is_match:
                 correct_predictions += 1
                 print(f"RESULT: [SUCCESS] Predicted: {prediction} | GT: {ground_truth}")
             else:
                 print(f"RESULT: [FAILED] Predicted: {prediction} | GT: {ground_truth}")
+
             
     end_time = time.time()
     accuracy = (correct_predictions / total) * 100 if total > 0 else 0
