@@ -3,17 +3,6 @@ import re
 
 
 def load_lai_gai(dataset_root: str, total_limit: int = None) -> list[dict]:
-    """
-    Loads the LAI-GAI dataset by extracting emotion labels from filenames using regex.
-    Expected filename format: <digit>_<emotion>.png (e.g., '000_Craving.png', '013_Nurturant love.png').
-
-    Args:
-        dataset_root: Path to the directory containing LAI-GAI images.
-        total_limit: Optional limit distributed evenly across emotion classes.
-
-    Returns:
-        List of dictionaries with 'image_path' and 'ground_truth'.
-    """
     if not os.path.exists(dataset_root):
         print(f"Warning: LAI-GAI directory '{dataset_root}' not found.")
         return []

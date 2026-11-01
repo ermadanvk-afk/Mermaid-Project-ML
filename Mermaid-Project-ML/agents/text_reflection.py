@@ -8,7 +8,7 @@ from core.state import MERMAIDState
 from core.memory_manager import MemoryOrchestrator
 from core.schemas import ReflectionOutput
 
-# ── Perspectives from MERMAID paper, Appendix C ────────────────────────────
+# Reflection perspectives
 PERSPECTIVES = {
     "Default": (
         "You are an Emotion Assessment AI (Text-Only). "
@@ -53,7 +53,7 @@ PERSPECTIVES = {
     ),
 }
 
-# ── Base wrapper prompt (B5: avoided prompt duplication, added valid JSON example) ──
+# Base reflection prompt
 _BASE_PROMPT_TEMPLATE = (
     "{perspective}\n\n"
     "Your Task:\n"
@@ -77,24 +77,19 @@ _BASE_PROMPT_TEMPLATE = (
 
 
 def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: list) -> dict:
-    """
-    Safely extracts and validates JSON using the ReflectionOutput Pydantic schema.
-    Fallback searches only in the substring after 'suggestion' with word boundaries
-    and defaults to good_enough / current_prediction if parsing completely fails.
-    """
     text = raw.replace('\\_', '_').strip()
     if "```json" in text:
         text = text.split("```json")[1].split("```")[0].strip()
     elif "```" in text:
         text = text.split("```")[1].split("```")[0].strip()
 
-    # Extract JSON object substring { ... }
+    # Extract the JSON object
     json_match = re.search(r"\{.*?\}", text, re.DOTALL)
     if json_match:
         text = json_match.group(0)
 
     try:
-        # Validate against schema
+        # Validate the response
         parsed = ReflectionOutput.model_validate_json(text)
         suggestion = parsed.suggestion
         matched = next((e for e in candidate_emotions if e.lower() == suggestion.lower()), None)
@@ -115,7 +110,7 @@ def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: li
         elif "needs_revision" in lower or "needs revision" in lower:
             status = "needs_revision"
             suggestion = current_prediction
-            # Search only in substring after "suggestion" using word boundaries \b
+            # Search for a label after the suggestion field
             if "suggestion" in lower:
                 after_suggestion = raw[lower.find("suggestion"):]
                 for emotion in candidate_emotions:
@@ -123,7 +118,7 @@ def _parse_json_output(raw: str, current_prediction: str, candidate_emotions: li
                         suggestion = emotion
                         break
         else:
-            # If parsing completely fails, default to good_enough and current_prediction
+            # Use the current prediction if parsing fails
             status = "good_enough"
             suggestion = current_prediction
 
@@ -146,20 +141,19 @@ def _run_single_perspective(
     caption    = state.get("caption", "")
     prediction = state.get("current_prediction", "")
 
-    # Fill the perspective role description (contains caption and labels once)
+    # Build the perspective prompt
     role_text = PERSPECTIVES[perspective_name].format(
         current_emotion=prediction,
         caption=caption,
         labels=labels,
     )
 
-    # Build prompt without duplicating caption and label list twice (B5 fix)
     instruction = _BASE_PROMPT_TEMPLATE.format(
         perspective=role_text,
         current_emotion=prediction,
     )
 
-    # Load query image for LLaVA
+    # Load the query image
     image_path = state.get("image_path")
     if image_path:
         raw_image = Image.open(image_path).convert("RGB")
@@ -167,7 +161,6 @@ def _run_single_perspective(
     else:
         raw_image = Image.new("RGB", (336, 336), (255, 255, 255))
 
-    # B5: max_new_tokens increased to 200, no_repeat_ngram_size removed
     raw_output = memory_manager.generate_mllm_response(
         image=raw_image,
         prompt_text=instruction,
@@ -182,23 +175,17 @@ def _run_single_perspective(
 
 
 def _aggregate_votes(votes: list[dict], current_prediction: str) -> dict:
-    """
-    Aggregates multi-perspective votes by majority:
-      - status   : majority wins (tie → needs_revision to be safe)
-      - suggestion: most-common suggestion among "needs_revision" voters
-      - justification: only concatenated from voters whose status matches winning status_vote (B4 fix)
-    """
     statuses    = [v["status"] for v in votes]
     status_vote = Counter(statuses).most_common(1)[0][0]
 
-    # Among those voting needs_revision, find most common suggestion
+    # Select the most common suggested label
     revisers = [v["suggestion"] for v in votes if v["status"] == "needs_revision"]
     if revisers:
         suggestion = Counter(revisers).most_common(1)[0][0]
     else:
         suggestion = current_prediction
 
-    # B4 fix: Only join justifications from voters whose status matches the winning status_vote
+    # Use justifications matching the winning status
     matching_justifications = [v["justification"] for v in votes if v["status"] == status_vote]
     justifications = " | ".join(matching_justifications) if matching_justifications else ""
 
@@ -214,26 +201,12 @@ def run_text_reflection(
     memory_manager: MemoryOrchestrator,
     num_perspectives: int = 3,
 ) -> dict:
-    """
-    Multi-perspective textual self-reflection agent (MERMAID paper, Section 4.3).
-
-    Randomly samples `num_perspectives` perspectives from the defined set,
-    runs each as a separate MLLM call (text-only), then aggregates via majority vote.
-
-    Input:
-        state            – LangGraph state with 'caption', 'current_prediction', 'candidate_emotions'.
-        memory_manager   – Provides the 4-bit LLaVA-NeXT 7B model and processor.
-        num_perspectives – Number of perspectives to sample (default 3, per paper §5.3).
-
-    Output:
-        dict with key 'textual_feedback': {status, suggestion, justification}.
-    """
     print(f"--- [Agent: Text Reflection | LLaVA 1.5 7B | {num_perspectives} perspectives] ---")
 
-    # 1. Ensure LLaVA 1.5 7B is on GPU
+    # Load the language model
     memory_manager.load_mllm()
 
-    # 2. Sample perspectives (B9 fix: if cultural_mode, include Focus_cultural)
+    # Select perspectives
     cultural_mode = state.get("cultural_mode", False)
     specialist_pool = [p for p in PERSPECTIVES if p not in ("Default", "Focus_cultural")]
     if cultural_mode and "Focus_cultural" in PERSPECTIVES:
@@ -244,13 +217,13 @@ def run_text_reflection(
 
     print(f"    -> Sampled perspectives: {sampled}")
 
-    # 3. Run each perspective
+    # Run each perspective
     votes = []
     for perspective_name in sampled:
         vote = _run_single_perspective(perspective_name, state, memory_manager)
         votes.append(vote)
 
-    # 4. Aggregate by majority vote
+    # Aggregate the votes
     feedback = _aggregate_votes(votes, state.get("current_prediction", ""))
     print(f"    -> Aggregated: status={feedback['status']}, suggestion={feedback['suggestion']}")
 

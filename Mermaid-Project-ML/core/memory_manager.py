@@ -17,15 +17,6 @@ from core.qformer import CombinedModel, resize_image_to_512
 
 
 class MemoryOrchestrator:
-    """
-    Manages loading and unloading of models between CPU RAM and GPU VRAM
-    to prevent Out-Of-Memory errors on constrained hardware (12 GB VRAM).
-
-    MLLM  : LLaVA 1.5 7B (llava-hf/llava-1.5-7b-hf), loaded in
-            4-bit NF4 quantisation via bitsandbytes for multimodal reasoning.
-    Vision: 12-layer Q-Former + CLIP + InstructPix2Pix (with LCM LoRA)
-            for emotion-conditioned visual augmentation.
-    """
     def __init__(
         self,
         mllm_model_id: str = "llava-hf/llava-1.5-7b-hf",
@@ -91,9 +82,6 @@ class MemoryOrchestrator:
         repetition_penalty: float = 1.15,
         no_repeat_ngram_size: int = 0,
     ) -> str:
-        """
-        Executes inference on LLaVA 1.5 7B using the proper Vicuna/chat template.
-        """
         self.load_mllm()
         
         conversation = [
@@ -224,11 +212,6 @@ class MemoryOrchestrator:
         gc.collect()
 
     def extract_clip_image_embeds(self, image: Image.Image) -> torch.Tensor:
-        """
-        Extracts spatial patch CLIP image features ONCE per input image (resized to 512 short-side per A5)
-        in torch.float16 on GPU for rich multi-emotion Q-Former cross-attention.
-        Returns tensor of shape [1, 257, 768] (ViT-L patch tokens projected to Q-Former hidden size).
-        """
         if not self.diffusion_loaded:
             self.load_diffusion()
 
@@ -254,14 +237,6 @@ class MemoryOrchestrator:
         emotion: str = None,
         **kwargs,
     ) -> torch.Tensor:
-        """
-        Fuses CLIP image features and target emotion embedding via the 12-layer Q-Former.
-        Accepts:
-          - (image, emotion, img_embeds=...) OR
-          - (emotion, img_embeds=...) OR
-          - (emotion=emotion, img_embeds=...)
-        Produces prompt embeddings of shape [1, 77, 768] in float16 on GPU.
-        """
         if not self.diffusion_loaded:
             self.load_diffusion()
 

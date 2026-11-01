@@ -9,12 +9,6 @@ from core.schemas import ReflectionOutput
 
 
 def generate_caption(image_path: str, memory_manager: MemoryOrchestrator) -> str:
-    """
-    Helper to generate a concise emotional caption for an image using LLaVA 1.5 7B.
-    Delegates to memory_manager.generate_mllm_response() so the proper
-    LLaVA conversation chat-template is applied automatically.
-    Capped at 512x512 resolution (B7 fix).
-    """
     raw_image = Image.open(image_path).convert("RGB")
     raw_image.thumbnail((512, 512), Image.LANCZOS)
     prompt_text = (
@@ -33,17 +27,13 @@ def generate_caption(image_path: str, memory_manager: MemoryOrchestrator) -> str
 
 
 def _parse_visual_reflection_output(raw_output: str, current_prediction: str, candidate_emotions: list) -> dict:
-    """
-    Safely parses JSON from MLLM output, handling markdown, conversational preambles,
-    non-dictionary JSON values (e.g. raw numbers), and providing resilient fallbacks.
-    """
     text = raw_output.replace('\\_', '_').strip()
     if "```json" in text:
         text = text.split("```json")[1].split("```")[0].strip()
     elif "```" in text:
         text = text.split("```")[1].split("```")[0].strip()
 
-    # Extract JSON object { ... } via regex
+    # Extract the JSON object
     json_match = re.search(r"\{.*?\}", text, re.DOTALL)
     if json_match:
         text = json_match.group(0)
@@ -60,7 +50,7 @@ def _parse_visual_reflection_output(raw_output: str, current_prediction: str, ca
 
     if raw_dict is not None:
         try:
-            # Map legacy 'feedback' key to 'justification'
+            # Support the legacy feedback field
             if "feedback" in raw_dict and "justification" not in raw_dict:
                 raw_dict["justification"] = raw_dict.pop("feedback")
 
@@ -77,7 +67,7 @@ def _parse_visual_reflection_output(raw_output: str, current_prediction: str, ca
         except Exception as val_err:
             print(f"    [Warning] Schema validation failed: {val_err}. Dict: {raw_dict}")
 
-    # Resilient heuristic fallback if JSON structure is missing
+    # Use a fallback when JSON is missing
     lower = raw_output.lower()
     if "good_enough" in lower or "good enough" in lower:
         status = "good_enough"
@@ -99,18 +89,12 @@ def _parse_visual_reflection_output(raw_output: str, current_prediction: str, ca
 
 
 def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrator) -> dict:
-    """
-    Compares the original image against the generated reference images to provide
-    visual feedback on the prediction using LLaVA 1.5 7B.
-
-    Features B6 disk/state reference caption caching (0 MLLM calls on cache hit) and B7 resolution capping.
-    """
     print("--- [Agent: Visual Reflection | LLaVA 1.5 7B] ---")
     
-    # 1. Ensure LLaVA 1.5 7B is loaded on GPU
+    # Load the language model
     memory_manager.load_mllm()
 
-    # 2. Reference caption caching (B6 fix): check state and on-disk cache
+    # Check for cached reference captions
     image_path = state['image_path']
     image_id = os.path.splitext(os.path.basename(image_path))[0]
     cache_dir = "generated_refs"
@@ -121,11 +105,11 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
     cached_captions = dict(state.get("reference_captions") or {})
     loaded_from_cache = False
 
-    # Check 1: In state
+    # Check the state cache
     if cached_captions and len(cached_captions) == len(ref_images) and all(e in cached_captions for e in ref_images.keys()):
         print(f"--- [Agent: Visual Reflection] Reusing reference captions from state for {image_id} (0 MLLM calls) ---")
         loaded_from_cache = True
-    # Check 2: On disk
+    # Check the disk cache
     elif os.path.exists(cache_file):
         try:
             with open(cache_file, "r", encoding="utf-8") as f:
@@ -137,7 +121,7 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
         except Exception as e:
             print(f"    [Warning] Failed to load disk caption cache {cache_file}: {e}")
 
-    # Generate reference captions if not cached
+    # Generate missing reference captions
     if not loaded_from_cache:
         print("    -> Generating captions for reference images...")
         for emotion, ref_img_path in ref_images.items():
@@ -146,7 +130,7 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
                 cached_captions[emotion] = ref_caption
                 print(f"       Generated caption for '{emotion}'")
 
-        # Save to disk cache
+        # Save the captions
         try:
             with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(cached_captions, f, indent=2)
@@ -164,7 +148,7 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
 
     ref_context_str = "\n".join(ref_contexts)
 
-    # 3. Construct the visual-reflection prompt for LLaVA-NeXT 7B
+    # Build the reflection prompt
     instruction = (
         f"You are a visual reflection agent tasked with assessing the emotion of a given query image.\n"
         f"The predicted emotion is: \"{state['current_prediction']}\". "
@@ -191,11 +175,11 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
         "Do not include any other text."
     )
 
-    # 4. Cap query image resolution (B7 fix: max dim 512x512, max_pixels <= 262144)
+    # Load and resize the query image
     raw_image = Image.open(image_path).convert("RGB")
     raw_image.thumbnail((512, 512), Image.LANCZOS)
 
-    # 5. Run LLaVA 1.5 7B via chat-template pipeline
+    # Generate a response
     raw_output = memory_manager.generate_mllm_response(
         image=raw_image,
         prompt_text=instruction,
@@ -204,7 +188,7 @@ def run_visual_reflection(state: MERMAIDState, memory_manager: MemoryOrchestrato
         no_repeat_ngram_size=0,
     )
     
-    # 6. Parse JSON with safe fallback
+    # Parse the response
     feedback = _parse_visual_reflection_output(
         raw_output=raw_output,
         current_prediction=state['current_prediction'],

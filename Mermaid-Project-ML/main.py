@@ -13,31 +13,6 @@ from agents.augmentation import run_augmentation_agent
 from agents.visual_reflection import run_visual_reflection
 
 def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
-    """
-    Builds and compiles the LangGraph workflow matching Algorithm 1 of the paper.
-
-    Graph structure (3 blocks):
-
-    BLOCK 1 — Initial pass:
-        captioning → decision[Qinit] → text_reflection
-
-    BLOCK 2 — Textual guidance:
-        text_reflection:
-            good_enough  → cleanup → END
-            needs_revision → decision_after_text[Qtext]
-        decision_after_text → augmentation
-
-    BLOCK 3 — Visual loop (repeats up to max_iterations):
-        augmentation → visual_reflection
-        visual_reflection:
-            good_enough  → cleanup → END
-            needs_revision → decision_after_visual[Qvis]
-        decision_after_visual → text_reflection
-        text_reflection (re-run):
-            good_enough  → cleanup → END
-            needs_revision → decision_after_text[Qtext] → augmentation (new iteration)
-    """
-
     # --- Node wrappers -------------------------------------------------------
 
     def caption_node(state: MERMAIDState):
@@ -51,11 +26,6 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         return result
 
     def decision_after_text_node(state: MERMAIDState):
-        """
-        Block 2 / loop re-entry: re-predict with Qtext (textual feedback injected).
-        Increments iteration counter when coming from the visual loop (query_mode == 'qvis'),
-        matching the for-loop counter in Algorithm 1, Line 8.
-        """
         iteration = state.get("iteration", 0)
         if state.get("query_mode") == "qvis":
             iteration += 1
@@ -97,21 +67,11 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
     # --- Routing functions ---------------------------------------------------
 
     def route_after_text_reflection(state: MERMAIDState) -> str:
-        """
-        After text reflection:
-        good_enough   → accept current prediction, exit.
-        needs_revision → call Decision Agent again with Qtext guidance.
-        """
         if state.get("textual_feedback", {}).get("status") == "good_enough":
             return END
         return "decision_after_text"
 
     def route_after_visual_reflection(state: MERMAIDState) -> str:
-        """
-        After visual reflection:
-        good_enough or max_iterations reached → accept, exit.
-        needs_revision → call Decision Agent with Qvis guidance.
-        """
         if (
             state.get("visual_feedback", {}).get("status") == "good_enough"
             or state["iteration"] >= state["max_iterations"]
@@ -120,28 +80,10 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         return "decision_after_visual"
 
     def route_after_decision_after_visual(state: MERMAIDState) -> str:
-        """
-        After Decision[Qvis], run Text Reflection again (Algorithm 1, Line 15).
-        Then:
-        good_enough   → exit.
-        needs_revision → increment iteration, Decision[Qtext] → Augmentation (new loop).
-        The text_reflection node will be reused; its routing handles the branching.
-        """
         # Always go to text_reflection to cross-verify (Algorithm 1, Line 15)
         return "text_reflection"
 
     def route_after_text_reflection_in_loop(state: MERMAIDState) -> str:
-        """
-        Text reflection can be reached from two paths:
-        1. After initial decision (Block 2) — query_mode == "qinit"
-        2. After Decision[Qvis]            — query_mode == "qvis"
-
-        In both cases the routing logic is the same:
-        good_enough   → END
-        needs_revision → decision_after_text (which then goes to augmentation)
-
-        Iteration is incremented here only when we're re-entering the loop.
-        """
         if (
             state.get("textual_feedback", {}).get("status") == "good_enough"
             or state.get("iteration", 0) >= state.get("max_iterations", 3)

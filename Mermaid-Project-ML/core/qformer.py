@@ -10,16 +10,6 @@ from transformers import (
 )
 
 class CombinedModel(nn.Module):
-    """
-    12-layer Q-Former architecture as designed in EmoEdit (Yang et al., 2024b) 
-    and integrated in MERMAID (Yang et al., 2025).
-
-    It fuses image features and target emotion embeddings via 76 learned query tokens:
-    - Base: 12-layer Blip2QFormerModel (12 heads, hidden_size 768, encoder_hidden_size 768)
-    - Query tokens: 76 learnable tokens of dim 768
-    - Input: CLIP image embedding (1 token x 768) + CLIP emotion text embedding (1 token x 768)
-    - Output: 77 fused emotion prompt tokens of dim 768 (matching SD 1.5 / InstructPix2Pix text latent space)
-    """
     def __init__(self, num_query_tokens: int = 76, hidden_size: int = 768, ln: nn.Module = None):
         super(CombinedModel, self).__init__()
         qformer_config = Blip2QFormerConfig()
@@ -34,14 +24,6 @@ class CombinedModel(nn.Module):
         self.layer_norm = ln if ln is not None else nn.LayerNorm(hidden_size, eps=1e-12)
 
     def forward(self, text_embeds: torch.Tensor, img_embeds: torch.Tensor) -> torch.Tensor:
-        """
-        Fuses text and image embeddings.
-        Args:
-            text_embeds: Tensor of shape [batch_size, 768] or [batch_size, 1, 768]
-            img_embeds:  Tensor of shape [batch_size, 768] or [batch_size, 1, 768]
-        Returns:
-            normal_output: Tensor of shape [batch_size, 77, 768]
-        """
         if img_embeds.dim() == 2:
             img_embeds = img_embeds.unsqueeze(1)
         if text_embeds.dim() == 2:
@@ -71,10 +53,6 @@ class CombinedModel(nn.Module):
 
 
 def resize_image_to_512(img: Image.Image) -> Image.Image:
-    """
-    Resizes image maintaining aspect ratio with max dimension 512,
-    ensuring width and height are multiples of 8 for Stable Diffusion VAE compatibility.
-    """
     img = img.convert("RGB")
     width, height = img.size
     if width < height:

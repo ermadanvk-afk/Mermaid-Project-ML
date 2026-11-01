@@ -2,16 +2,6 @@ import os
 import glob
 
 def load_artphoto(dataset_root: str) -> list[dict]:
-    """
-    Loads the Artphoto dataset.
-    Assumes standard directory structure: dataset_root/emotion_class/image.jpg
-    
-    Args:
-        dataset_root: Path to the root folder of Artphoto.
-        
-    Returns:
-        List of dictionaries containing 'image_path' and 'ground_truth' label.
-    """
     data = []
     if not os.path.exists(dataset_root):
         print(f"Warning: Artphoto directory '{dataset_root}' not found.")
