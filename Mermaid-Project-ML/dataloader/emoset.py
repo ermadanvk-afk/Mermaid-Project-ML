@@ -3,20 +3,6 @@ import glob
 
 
 def load_emoset(dataset_root: str, total_limit: int = None) -> list[dict]:
-    """
-    Loads the EmoSet dataset uniformly across classes.
-    Supports:
-      1. Flat directory: dataset_root/emotion_xxxxx.jpg
-      2. Nested directories: dataset_root/emotion_class/*.jpg
-    
-    Args:
-        dataset_root: Path to the root folder of EmoSet.
-        total_limit: If specified, returns exactly this many images, distributed
-                     as evenly as possible across all available classes.
-        
-    Returns:
-        List of dictionaries containing 'image_path' and 'ground_truth' label.
-    """
     if not os.path.exists(dataset_root):
         print(f"Warning: EmoSet directory '{dataset_root}' not found.")
         return []

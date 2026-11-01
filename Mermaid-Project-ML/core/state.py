@@ -7,28 +7,12 @@ FeedbackStatus = Literal["good_enough", "needs_revision"]
 QueryMode = Literal["qinit", "qtext", "qvis"]
 
 class FeedbackDict(TypedDict):
-    """
-    Structured feedback returned by the reflection agents.
-
-    Fields:
-        status: whether the current decision is acceptable
-        suggestion: optional improvement or alternative emotion candidate
-        justification: explanation for why the decision passed or failed
-    """
     status: FeedbackStatus
     suggestion: str
     justification: str
 
 
 class MERMAIDState(TypedDict):
-    """
-    Main state dictionary shared across the LangGraph workflow.
-
-    This object represents a single inference request and is updated by the
-    captioning, decision, textual reflection, augmentation, and visual
-    reflection nodes.
-    """
-
     # Inputs
     image_path: str
     candidate_emotions: List[str]
@@ -66,13 +50,6 @@ def create_initial_state(
     max_iterations: int = 3,
     use_qformer: Optional[bool] = None,
 ) -> MERMAIDState:
-    """
-    Initialize the state for a new image inference request.
-
-    This function creates the starting state before the captioning node runs.
-    It ensures the iteration counter begins at zero and the feedback fields
-    are empty until the agents produce results.
-    """
     if not image_path:
         raise ValueError("image_path cannot be empty.")
 
@@ -102,12 +79,6 @@ def create_initial_state(
 
 
 def set_prediction(state: MERMAIDState, emotion: str) -> None:
-    """
-    Set the current prediction for the state.
-
-    This function enforces the architectural rule that the prediction must
-    be one of the allowed candidate emotions.
-    """
     if emotion not in state["candidate_emotions"]:
         raise ValueError(
             f"Emotion '{emotion}' is not in candidate_emotions: "
@@ -123,13 +94,6 @@ def set_textual_feedback(
     suggestion: str,
     justification: str,
 ) -> None:
-    """
-    Store the result of the textual self-reflection pass.
-
-    This is called after the caption and current prediction are compared.
-    The feedback determines whether the workflow should continue to
-    augmentation or end early.
-    """
     state["textual_feedback"] = {
         "status": status,
         "suggestion": suggestion,
@@ -143,13 +107,6 @@ def set_visual_feedback(
     suggestion: str,
     justification: str,
 ) -> None:
-    """
-    Store the result of the visual self-reflection pass.
-
-    This reflects the comparison between the original image and the generated
-    reference images. It becomes the criterion for accepting the prediction
-    or repeating the decision loop.
-    """
     state["visual_feedback"] = {
         "status": status,
         "suggestion": suggestion,
@@ -158,12 +115,6 @@ def set_visual_feedback(
 
 
 def set_caption(state: MERMAIDState, caption: str) -> None:
-    """
-    Store the generated caption for the input image.
-
-    The caption acts as the semantic foundation for the decision node and the
-    textual reflection step.
-    """
     if not isinstance(caption, str):
         raise TypeError("caption must be a string.")
 
@@ -171,12 +122,6 @@ def set_caption(state: MERMAIDState, caption: str) -> None:
 
 
 def add_reference_image(state: MERMAIDState, emotion: str, image_path: str) -> None:
-    """
-    Save a generated reference image for a specific emotion.
-
-    This keeps track of all candidate-emotion visual references created during
-    the augmentation step.
-    """
     if emotion not in state["candidate_emotions"]:
         raise ValueError(f"Unknown emotion '{emotion}' for this state.")
 
@@ -187,33 +132,15 @@ def add_reference_image(state: MERMAIDState, emotion: str, image_path: str) -> N
 
 
 def increment_iteration(state: MERMAIDState) -> None:
-    """
-    Move to the next refinement loop iteration.
-
-    This is used when the current prediction is not yet accepted and the system
-    must revisit the decision node with updated feedback.
-    """
     state["iteration"] += 1
 
 
 def clear_feedback(state: MERMAIDState) -> None:
-    """
-    Reset feedback fields before the next round of reflective evaluation.
-
-    This is useful when a new decision loop begins and the previous feedback
-    should be discarded.
-    """
     state["textual_feedback"] = None
     state["visual_feedback"] = None
 
 
 def is_terminal_state(state: MERMAIDState) -> bool:
-    """
-    Return True when the workflow should stop.
-
-    The system ends early if either reflection layer marks the current
-    decision as good enough, or if the iteration count reaches the maximum.
-    """
     if state["textual_feedback"] is not None:
         if state["textual_feedback"]["status"] == "good_enough":
             return True
@@ -229,12 +156,6 @@ def is_terminal_state(state: MERMAIDState) -> bool:
 
 
 def validate_state(state: MERMAIDState) -> None:
-    """
-    Validate that the state contains all required keys and coherent values.
-
-    This acts as a functional guard before the graph executes a node,
-    preventing invalid transitions and data corruption.
-    """
     required_fields = {
         "image_path": str,
         "candidate_emotions": list,

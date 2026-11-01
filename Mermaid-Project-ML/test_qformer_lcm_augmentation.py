@@ -1,33 +1,4 @@
 #!/usr/bin/env python3
-"""
-Test Suite: Q-Former Embedding Injection & LCM-Accelerated Reference Generation
-================================================================================
-Verifies that:
-1. CombinedModel (12-layer Q-Former) correctly fuses image & text features into
-   a 77-token prompt embedding tensor ([batch_size, 77, 768]) in float16.
-2. MemoryOrchestrator properly configures:
-   - CLIP text/image feature extraction
-   - Q-Former conditioning (76 query tokens + 1 text token -> 77 tokens)
-   - Diffusers InstructPix2Pix pipeline with LCMScheduler & LCM-LoRA weights.
-3. run_augmentation_agent consumes:
-   - Exact Q-Former prompt_embeds ([1, 77, 768], float16)
-   - Perfectly matched negative_prompt_embeds ([1, 77, 768], float16)
-   - LCM generation parameters (num_inference_steps=6, guidance_scale=1.8, image_guidance_scale=1.5)
-   - Single CLIP feature extraction per image (avoiding redundant vision passes)
-   - Resized input image (short-side 512, multiples of 8)
-   - Generates & caches reference images at 256x256.
-
-Usage:
-    # 1. Run full unit/mock test suite (fast, no massive GPU downloads required):
-    python test_qformer_lcm_augmentation.py
-
-    # 2. Run with pytest:
-    pytest test_qformer_lcm_augmentation.py -v
-
-    # 3. Optional: Run live GPU test (requires GPU and model weights):
-    python test_qformer_lcm_augmentation.py --live
-"""
-
 import os
 import sys
 import tempfile
@@ -65,10 +36,6 @@ class TestQFormerArchitecture(unittest.TestCase):
         self.assertEqual(self.model.model.config.hidden_size, 768)
 
     def test_qformer_forward_embedding_fusion_shape(self):
-        """
-        Verify forward pass:
-        text_embeds [1, 768] + img_embeds [1, 768] -> normal_output [1, 77, 768].
-        """
         batch_size = 1
         text_embeds = torch.randn(batch_size, 768, device=self.device)
         img_embeds = torch.randn(batch_size, 768, device=self.device)
@@ -167,14 +134,6 @@ class TestMemoryOrchestratorWiring(unittest.TestCase):
 
 
 class TestAugmentationAgentConsumption(unittest.TestCase):
-    """
-    Layer 4: Critical Test - Verify that run_augmentation_agent consumes:
-    1. Q-Former prompt_embeds
-    2. Correct negative_prompt_embeds (77 tokens, float16)
-    3. LCM parameters (steps=6, guidance=1.8, image_guidance=1.5)
-    4. Only a single CLIP image feature extraction per image
-    """
-
     def setUp(self):
         # Create a temporary input image
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -190,14 +149,6 @@ class TestAugmentationAgentConsumption(unittest.TestCase):
         self.temp_dir.cleanup()
 
     def test_qformer_injection_and_lcm_consumption(self):
-        """
-        Verify run_augmentation_agent passes:
-          - prompt_embeds (NOT prompt text)
-          - negative_prompt_embeds
-          - num_inference_steps == 6 (LCM)
-          - guidance_scale == 1.8
-          - image_guidance_scale == 1.5
-        """
         candidate_emotions = ["amusement", "anger", "sadness"]
         state = {
             "image_path": self.test_img_path,
@@ -353,10 +304,6 @@ class TestAugmentationAgentConsumption(unittest.TestCase):
                     os.remove(path)
 
     def test_76_token_shape_guard_padding(self):
-        """
-        Verify the shape guard in augmentation.py:
-        If Q-Former output is 76 tokens, it pads with 1 token to 77 to match SD 1.5 latent space.
-        """
         candidate_emotions = ["joy"]
         state = {
             "image_path": self.test_img_path,
@@ -404,12 +351,6 @@ class TestAugmentationAgentConsumption(unittest.TestCase):
                     os.remove(path)
 
     def test_affective_prompt_fallback_when_qformer_false(self):
-        """
-        Verify that when use_qformer=False, pipeline consumes:
-          - text prompt from AFFECTIVE_PROMPT_MAP
-          - no prompt_embeds
-          - LCM acceleration (steps=6, guidance=1.8, img_guidance=1.5)
-        """
         state = {
             "image_path": self.test_img_path,
             "candidate_emotions": ["amusement"],
@@ -457,11 +398,6 @@ def tearDownModule():
 
 
 def run_live_gpu_test(args):
-    """
-    Live end-to-end test on real GPU with loaded weights.
-    Supports real input image, custom candidate emotions, and Q-Former or Affective Prompt mode.
-    Triggered with `python test_qformer_lcm_augmentation.py --live`.
-    """
     print("\n" + "=" * 70)
     print("RUNNING LIVE GPU GENERATION (InstructPix2Pix + LCM LoRA)")
     print("=" * 70)

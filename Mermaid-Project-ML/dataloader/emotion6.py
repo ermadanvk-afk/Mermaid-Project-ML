@@ -2,18 +2,6 @@ import os
 import glob
 
 def load_emotion6(dataset_root: str, total_limit: int = None) -> list[dict]:
-    """
-    Loads the Emotion6 dataset uniformly across classes.
-    Assumes standard directory structure: dataset_root/emotion_class/image.jpg
-    
-    Args:
-        dataset_root: Path to the root folder of Emotion6.
-        total_limit: If specified, returns exactly this many images, distributed
-                     as evenly as possible across all available classes.
-        
-    Returns:
-        List of dictionaries containing 'image_path' and 'ground_truth' label.
-    """
     if not os.path.exists(dataset_root):
         print(f"Warning: Emotion6 directory '{dataset_root}' not found.")
         return []
