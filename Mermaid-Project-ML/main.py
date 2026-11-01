@@ -45,7 +45,10 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
 
     def decision_node(state: MERMAIDState):
         """Block 1: initial prediction with Qinit (no feedback)."""
-        return {**run_decision_agent(state, memory_manager), "query_mode": "qinit"}
+        state_for_agent = {**state, "query_mode": "qinit"}
+        result = run_decision_agent(state_for_agent, memory_manager)
+        result["query_mode"] = "qinit"
+        return result
 
     def decision_after_text_node(state: MERMAIDState):
         """
@@ -53,16 +56,22 @@ def build_graph(memory_manager: MemoryOrchestrator) -> StateGraph:
         Increments iteration counter when coming from the visual loop (query_mode == 'qvis'),
         matching the for-loop counter in Algorithm 1, Line 8.
         """
-        result = run_decision_agent(state, memory_manager)
-        result["query_mode"] = "qtext"
-        # Increment iteration only when looping back (not on the first Block 2 pass)
+        iteration = state.get("iteration", 0)
         if state.get("query_mode") == "qvis":
-            result["iteration"] = state.get("iteration", 0) + 1
+            iteration += 1
+
+        state_for_agent = {**state, "query_mode": "qtext", "iteration": iteration}
+        result = run_decision_agent(state_for_agent, memory_manager)
+        result["query_mode"] = "qtext"
+        result["iteration"] = iteration
         return result
 
     def decision_after_visual_node(state: MERMAIDState):
         """Block 3: re-predict with Qvis (visual feedback injected)."""
-        return {**run_decision_agent(state, memory_manager), "query_mode": "qvis"}
+        state_for_agent = {**state, "query_mode": "qvis"}
+        result = run_decision_agent(state_for_agent, memory_manager)
+        result["query_mode"] = "qvis"
+        return result
 
     def text_reflection_node(state: MERMAIDState):
         return run_text_reflection(state, memory_manager)
