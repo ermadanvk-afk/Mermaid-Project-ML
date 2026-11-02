@@ -8,49 +8,6 @@ This repository translates state-of-the-art affective image recognition research
 
 ## Project Overview
 
-## Original MERMAID Paper Architecture
-
-Emotion recognition in natural scenes is notoriously difficult: unlike facial-centric benchmarks with exaggerated expressions, naturalistic images feature affective cues that are implicit, context-dependent, and spatially dispersed across lighting, background objects, and body postures. Single-pass Vision-Language Models (VLMs) routinely fail because they lack self-critical reasoning and cannot test alternative hypotheses.
-
-The original MERMAID paper formulates emotion recognition as a **game-theoretic multi-agent decision process** consisting of three synergistic blocks:
-
-```mermaid
-flowchart TD
-    InputNode["Input: Query Image I + Candidate Emotions E"] --> Block1
-
-    subgraph Block1["Block 1: Initial Perception"]
-        DecAgent0["Decision Agent"] --> InitPred["Initial Prediction e(0)"]
-    end
-
-    InitPred --> Block2
-
-    subgraph Block2["Block 2: Textual Self-Reflection"]
-        TextReflect["Textual Self-Reflection Agent<br>(Facial, Scene, Color, Social Viewpoints)"]
-        TextCheck{"Status ==<br>good_enough?"}
-        TextReflect --> TextCheck
-        TextCheck -- "No (Needs Revision)" --> DecAgentText["Decision Agent (Qtext)"]
-        DecAgentText --> PredPrime["Refined Prediction e'"]
-    end
-
-    TextCheck -- "Yes" --> EarlyExit1["Exit: Final Prediction e(0)"]
-    PredPrime --> Block3
-
-    subgraph Block3["Block 3: Visual Augmentation & Reflection Loop"]
-        AugAgent["Augmentation Agent<br>(Q-Former + InstructPix2Pix)"] --> GenImages["Synthesize Emotion References {I_e}"]
-        GenImages --> VisReflect["Visual Self-Reflection Agent<br>(Audits Lighting, Composition, Posture)"]
-        VisCheck{"Status ==<br>good_enough?"}
-        VisReflect --> VisCheck
-        VisCheck -- "No (Needs Revision)" --> DecAgentVis["Decision Agent (Qvis)"]
-        DecAgentVis --> PredDoublePrime["Prediction e''"]
-        PredDoublePrime --> ReVerify["Cross-Modal Text Verification"]
-        ReVerify --> LoopCheck{"Consensus or<br>t ≥ T_max?"}
-        LoopCheck -- "No" --> AugAgent
-    end
-
-    VisCheck -- "Yes" --> EarlyExit2["Exit: Final Prediction e'"]
-    LoopCheck -- "Yes" --> FinalExit["Final Prediction e_final"]
-```
-
 ### Original Paper Execution Workflow
 
 Below is the conceptual illustration from the MERMAID paper demonstrating how an ambiguous input image (initially misclassified as *"Sadness"*) is sequentially audited by the Textual Self-Reflection Agent, visually contrasted against synthesized emotional exemplars by the Augmentation Agent, and calibrated to its true state (*"Amusement"*):
@@ -248,8 +205,6 @@ ml-mermaid/
 │   ├── text_reflection.py          # Multi-perspective textual reflection assessor
 │   ├── augmentation.py             # Q-Former + LCM-LoRA InstructPix2Pix reference generator
 │   └── visual_reflection.py        # Cross-modal visual reflection auditor & captioner
-├── notebooks/
-│   └── zero_shot_instructblip_laigai.ipynb  # End-to-end ablation notebook for LAI-GAI
 ├── dataloader/
 │   ├── emoset.py                   # EmoSet dataset loader and sampler
 │   └── emotion6.py                 # Emotion6 dataset loader
@@ -286,11 +241,6 @@ unzip -q -o checkpoint/Q-Former.zip -d checkpoint/
   ```bash
   python main.py
   ```
-* **Interactive Ablation Studies on Kaggle/Colab**:
-  Open `notebooks/zero_shot_instructblip_laigai.ipynb` to execute:
-  1. Direct Zero-Shot VLM baseline on LAI-GAI.
-  2. Multi-Perspective Textual Reflection Ablation (Paper Table 2, Row 2).
-  3. Generative Visual Reflection Ablation with Q-Former (Paper Table 2, Row 3).
 
 ---
 
@@ -298,4 +248,4 @@ unzip -q -o checkpoint/Q-Former.zip -d checkpoint/
 
 * **Umesh Vishwakarma** – Directed data aggregation and sampling methodologies; engineered the core system infrastructure, data loaders, and memory management routines.
 * **Pulak Kumar Sarkar** – Architected the visual augmentation pipeline; integrated the 12-layer Q-Former and LCM-LoRA InstructPix2Pix generative reflection process.
-* **Madan Vishwakarma** – High-level and low-level architectural formulation of the paper's multi-agent decision game; led benchmarking, parameter analysis, and continuous evaluation across Emotion6, EmoSet, ArtPhoto, and LAI-GAI.
+* **Madan Vishwakarma** – High-level and low-level architectural formulation of the paper's multi-agent decision game; led benchmarking,continuous evaluation across Emotion6, EmoSet, ArtPhoto, and LAI-GAI.
