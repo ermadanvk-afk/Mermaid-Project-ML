@@ -246,6 +246,6 @@ unzip -q -o checkpoint/Q-Former.zip -d checkpoint/
 
 ## Contributors
 
-* **Umesh Vishwakarma** – Directed data aggregation and sampling methodologies; engineered the core system infrastructure, data loaders, and memory management routines.
-* **Pulak Kumar Sarkar** – Architected the visual augmentation pipeline; integrated the 12-layer Q-Former and LCM-LoRA InstructPix2Pix generative reflection process.
-* **Madan Vishwakarma** – High-level and low-level architectural formulation of the paper's multi-agent decision game; led benchmarking,continuous evaluation across Emotion6, EmoSet, ArtPhoto, and LAI-GAI.
+* **Umesh Vishwakarma** – Directed data aggregation and sampling methodologies; engineered the core system infrastructure, data loaders, memory management routines and LCM-LoRA InstructPix2Pix.
+* **Pulak Kumar Sarkar** – Architected the visual augmentation pipeline; integrated the 12-layer Q-Former generative reflection process.
+* **Madan Vishwakarma** – High-level and low-level architectural formulation of the paper's multi-agent decision game; led benchmarking, ablation study on Demographically diverse dataset, continuous evaluation across Emotion6, EmoSet, ArtPhoto, and LAI-GAI.
